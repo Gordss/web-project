@@ -44,3 +44,11 @@ a:hover, h1:hover {
 .centered-text {
     text-align: center;
 }
+
+table {
+    width: 100%;
+}
+
+td {
+    width: 50%;
+}

@@ -1,13 +1,12 @@
 <?php
 
 require "Storage.php";
-
-if ($_FILES['file']['name']) {
-    verifyFileType();
-    Storage::getInstance()->insertArchive($_FILES["file"]["tmp_name"], $_FILES['file']['name'], 1);
-} else {
+if (!isset($_FILES['file'])) {
     echo 'No file uploaded';
+    die;
 }
+verifyFileType();
+Storage::getInstance()->insertArchive($_FILES["file"]["tmp_name"], $_FILES['file']['name'], 1);
 
 function verifyFileType()
 {
