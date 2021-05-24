@@ -9,7 +9,11 @@ if (!isset($_FILES['file'])) {
 $storage = Storage::getInstance();
 
 verifyFileType();
-$storage->insertArchive($_FILES["file"]["tmp_name"], $_FILES['file']['name'], 1);
+$archive = $storage->insertArchive($_FILES["file"]["tmp_name"], $_FILES['file']['name'], 1);
+if (is_string($archive)) {
+    respondWithInternalServerError($archive);
+}
+echo $archive->toCSV();
 
 function verifyFileType()
 {
@@ -26,5 +30,12 @@ function respondWithBadRequest($reason)
 {
     http_response_code(400);
     echo $reason;
+    die;
+}
+
+function respondWithInternalServerError($reason)
+{
+    http_response_code(500);
+    error_log($reason, 3, 'errors.log');
     die;
 }

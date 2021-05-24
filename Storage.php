@@ -1,7 +1,6 @@
 <?php
 
 require "model/Archive.php";
-require "model/File.php";
 
 const DIRECTORY_TYPE = "directory";
 class Storage
@@ -20,99 +19,40 @@ class Storage
 
     public function insertArchive($path, $archiveName, $userID)
     {
-        $stmt = $this->conn->prepare('INSERT INTO web_project.archives (user_id) VALUES(?)');
-        if (!$stmt->execute([$userID])) {
-            echo 'Could not insert archive in DB';
-            // TODO respond with 500
-            die;
+        try {
+            $stmt = $this->conn->prepare('INSERT INTO web_project.archives (user_id) VALUES(?)');
+            $stmt->execute([$userID]);
+        } catch (Exception $e) {
+            error_log('Could not insert archive in DB. Reason: ' . $e->getMessage(), 3, 'errors.log');
+            return null;
         }
         $archiveID = $this->conn->lastInsertId();
 
-        $files = array(new File($archiveID, $archiveName, null, 0, DIRECTORY_TYPE));
-        $zip = new ZipArchive();
+        $archive = new Archive($archiveName, $path);
+        $files = $archive->getFiles();
 
-        if (!$zip->open($path)) {
-            echo "Could not open zip archive";
-            // TODO repsond with 500
-            die;
-        }
-
-        for ($i = 0; $i < $zip->numFiles; $i++) {
-            $filePathInfo = pathinfo($zip->getNameIndex($i));
-            if ($filePathInfo['dirname'] === '.') {
-                $filePathInfo['dirname'] = "$archiveName";
-            } else {
-                $filePathInfo['dirname'] = "$archiveName/" . $filePathInfo['dirname'];
-            }
-
-            $dir = $filePathInfo['dirname'];
-            $type = $filePathInfo['extension'] ?? DIRECTORY_TYPE;
-            $baseName = $filePathInfo['basename'];
-            $fullName = "$dir/$baseName";
-            $contentLength = strlen($zip->getFromIndex($i));
-
-            echo "$i) Directory: $dir, name: $fullName, type: $type, length: $contentLength <br>";
-
-            array_push($files, new File($this->conn->lastInsertId(), $fullName, $dir, $contentLength, $type));
-        }
-        usort($files, "Storage::cmpFiles");
-
-        $sql = <<<SQL
-            INSERT INTO web_project.nodes (archive_id, name, parent_name, content_length, type) 
-                VALUES(?, ?, ?, ?, ?)
-            SQL;
+        $sql = 'INSERT INTO web_project.nodes (archive_id, name, parent_name, content_length, type) VALUES(?, ?, ?, ?, ?)';
         for ($i = 0; $i < sizeof($files); $i++) {
             $file = $files[$i];
-            $success = $this->conn->prepare($sql)->execute([
-                $archiveID,
-                $file->getName(),
-                $file->getParentName(),
-                $file->getContentLength(),
-                $file->getType()]);
-
-            if (!$success) {
-                echo 'Could not insert file with name ' . $file->getName();
-                die;
+            try {
+                $this->conn->prepare($sql)->execute([
+                    $archiveID, $file->getName(), $file->getParentName(), $file->getContentLength(), $file->getType()]);
+            } catch (Exception $e) {
+                error_log('Could not insert file ' . $file->getName() . $e->getMessage(), 3, 'errors.log');
+                return null;
             }
         }
-
+        return $archive;
     }
-
-    private static function cmpFiles($file1, $file2)
-    {
-        return strcmp(strlen($file1->getName()), strlen($file2->getName()));
-    }
-
-//
-//    public function fetchProducts(): array
-//    {
-//        $result = array();
-//        $stmt = $this->conn->query("SELECT * FROM web_hw2.products");
-//        while ($row = $stmt->fetch()) {
-//            array_push($result, new Product($row["id"], $row["name"], $row["quantity"]));
-//        }
-//        return $result;
-//    }
-
-//    public function addProduct($id, $quantity)
-//    {
-//        $stmt = $this->conn->prepare("SELECT quantity FROM web_hw2.products WHERE id = ?");
-//        $stmt->execute([$id]);
-//
-//        if ($stmt->rowCount() === 0) {
-//            $stmt = $this->conn->prepare("INSERT INTO web_hw2.products (`id`, `quantity`) VALUES (?,?)");
-//            $stmt->execute([$id, $quantity]);
-//        } else {
-//            $currentQuantity = $stmt->fetchAll()[0]['quantity'];
-//            $stmt = $this->conn->prepare("UPDATE web_hw2.products SET quantity = ? WHERE id = ?");
-//            $stmt->execute([$currentQuantity + $quantity, $id]);
-//        }
-//    }
 
     private function __construct()
     {
-        $this->conn = new PDO("mysql:host=localhost", "root", "");
-        $this->ensureTables();
+        try {
+            $this->conn = new PDO("mysql:host=localhost", "root", "");
+            $this->ensureTables();
+        } catch (Exception $e) {
+            error_log('Could not connect to DB: ' . $e->getMessage(), 3, 'errors.log');
+        }
     }
 
     private function ensureTables()
