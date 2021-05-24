@@ -6,14 +6,15 @@ if (!isset($_FILES['file'])) {
     respondWithBadRequest('No file uploaded');
 }
 
-$storage = Storage::getInstance();
 
 verifyFileType();
-$archive = $storage->insertArchive($_FILES["file"]["tmp_name"], $_FILES['file']['name'], 1);
-if (is_string($archive)) {
-    respondWithInternalServerError($archive);
+try {
+    $storage = Storage::getInstance();
+    $archive = $storage->insertArchive($_FILES["file"]["tmp_name"], $_FILES['file']['name'], 1);
+    echo $archive->toCSV();
+} catch (Exception $e) {
+    respondWithInternalServerError($e->getMessage());
 }
-echo $archive->toCSV();
 
 function verifyFileType()
 {
@@ -36,6 +37,7 @@ function respondWithBadRequest($reason)
 function respondWithInternalServerError($reason)
 {
     http_response_code(500);
+    echo 'Internal server error';
     error_log($reason, 3, 'errors.log');
     die;
 }

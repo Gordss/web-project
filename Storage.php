@@ -19,13 +19,8 @@ class Storage
 
     public function insertArchive($path, $archiveName, $userID)
     {
-        try {
-            $stmt = $this->conn->prepare('INSERT INTO web_project.archives (user_id) VALUES(?)');
-            $stmt->execute([$userID]);
-        } catch (Exception $e) {
-            error_log('Could not insert archive in DB. Reason: ' . $e->getMessage(), 3, 'errors.log');
-            return null;
-        }
+        $stmt = $this->conn->prepare('INSERT INTO web_project.archives (user_id) VALUES(?)');
+        $stmt->execute([$userID]);
         $archiveID = $this->conn->lastInsertId();
 
         $archive = new Archive($archiveName, $path);
@@ -34,25 +29,16 @@ class Storage
         $sql = 'INSERT INTO web_project.nodes (archive_id, name, parent_name, content_length, type) VALUES(?, ?, ?, ?, ?)';
         for ($i = 0; $i < sizeof($files); $i++) {
             $file = $files[$i];
-            try {
-                $this->conn->prepare($sql)->execute([
-                    $archiveID, $file->getName(), $file->getParentName(), $file->getContentLength(), $file->getType()]);
-            } catch (Exception $e) {
-                error_log('Could not insert file ' . $file->getName() . $e->getMessage(), 3, 'errors.log');
-                return null;
-            }
+            $this->conn->prepare($sql)->execute([
+                $archiveID, $file->getName(), $file->getParentName(), $file->getContentLength(), $file->getType()]);
         }
         return $archive;
     }
 
     private function __construct()
     {
-        try {
-            $this->conn = new PDO("mysql:host=localhost", "root", "");
-            $this->ensureTables();
-        } catch (Exception $e) {
-            error_log('Could not connect to DB: ' . $e->getMessage(), 3, 'errors.log');
-        }
+        $this->conn = new PDO("mysql:host=localhost", "root", "");
+        $this->ensureTables();
     }
 
     private function ensureTables()

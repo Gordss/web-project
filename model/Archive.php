@@ -10,7 +10,7 @@ class Archive
     {
         $zip = new ZipArchive();
         if (!$zip->open($path)) {
-            error_log('Could not open zip archive', 3, 'errors.log');
+            throw new Exception('Could not open zip archive at ' . $path);
         }
         $this->parseArchive($zip, $archiveName);
     }
