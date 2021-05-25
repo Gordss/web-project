@@ -2,15 +2,13 @@
 
 class File
 {
-    private $archive_id;
     private $name;
     private $parent_name;
     private $content_length;
     private $type;
 
-    public function __construct($archive_id, $name, $parent_name, $content_length, $type)
+    public function __construct($name, $parent_name, $content_length, $type)
     {
-        $this->archive_id = $archive_id;
         $this->name = $name;
         $this->parent_name = $parent_name;
         $this->content_length = $content_length;
