@@ -9,14 +9,14 @@
 </head>
 <body>
 <header id="main-header">
-    <a href=""><h1>TODO add heading</h1></a>
+    <a href=""><h1>Zip to ... Converter</h1></a>
     <nav>
         <ul id="navigation-list">
             <li>
-                <a href="https://github.com/Borislav-K" target="_blank">Github</a>
+                <a href="index.html">Nav1</a>
             </li>
             <li>
-                <a href="https://www.linkedin.com/in/borislav-karapanov-9284ab173/" target="_blank">LinkedIn</a>
+                <a href="index.html">Nav2</a>
             </li>
         </ul>
     </nav>
@@ -28,23 +28,22 @@
                 <section>
                     <form enctype="multipart/form-data">
                         <label>
-                            Choose a zip file to upload
-                            <input id="file-input" type="file" name="file">
+                            <h3>Choose a zip file to upload & convert to CSV:</h3>
                         </label>
-                        <button type="submit">Upload</button>
+                        <input id="file-input" type="file" name="file">
+                        <button id="file-input-btn" type="submit">Convert</button>
                     </form>
                 </section>
+                
             </td>
             <td>
-        <textarea>
-
-        </textarea>
+                <h3 id="download-label">Converted CSV file:</h3>
+                <a id="download-csv"><h3 id="download-link-label"></h3></a>
+                <textarea>
+                </textarea>
             </td>
         </tr>
     </table>
-
-
 </main>
-
 </body>
 </html>
