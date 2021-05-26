@@ -46,9 +46,65 @@ a:hover, h1:hover {
 }
 
 table {
-    width: 100%;
+    width: 90%;
+    margin-left: 5%;
 }
 
 td {
     width: 50%;
+    height: 500px;
+    vertical-align: top;
+    padding-top: 30px;
+}
+
+textarea {
+    width: 100%;
+    height: 90%;
+    overflow-y: scroll;
+    color: #22272E;
+}
+
+#file-input-btn {
+    color: #f76725;
+    background-color: white;
+    border-color: #f76725;
+    border-style: solid;
+    cursor: pointer;
+    display: inline;
+    float: right;
+    margin-right: 50px;
+}
+
+#file-chosen {
+    margin-left: 0.3rem;
+    font-family: sans-serif;
+}
+
+#download-csv {
+    display: none;
+    float: right;
+    text-align: right;
+}
+
+#download-label {
+    display: inline;
+    float: left;
+}
+
+#download-link-label:hover {
+    color: #f76725;
+}
+
+#file-input-btn:hover {
+    color: white;
+    background-color: #f76725;
+}
+
+button {
+    font-size: large;
+    font-family: Segoe UI, Helvetica, Arial, sans-serif;
+}
+
+#file-input {
+    font-size: large;
 }
