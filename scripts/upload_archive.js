@@ -6,7 +6,9 @@ function uploadArchive(event) {
     event.preventDefault();
 
     let zip = getUploadedFile();
-    let zipName = zip['name'];
+    if (!zip) {
+        return;
+    }
 
     const formData = new FormData();
     formData.append('file', zip);
@@ -14,11 +16,14 @@ function uploadArchive(event) {
     fetch('upload.php', {
         method: 'POST',
         body: formData
-    }).then(response => response.text())
-        .then(text => {
-            document.querySelector('textarea').innerHTML = text;
-            createCsvDownloadLink(text, zipName);
+    }).then(response => {
+        response.text().then(text => {
+            document.querySelector('textarea').innerHTML = text
+            if (response.status === 200) {
+                createCsvDownloadLink(text, zip['name']);
+            }
         });
+    })
 }
 
 function getUploadedFile() {
@@ -27,8 +32,6 @@ function getUploadedFile() {
 
 function createCsvDownloadLink(csvContent, zipName) {
     let fileName = zipName.substring(0, zipName.length - 3).concat("csv");
-
-    console.log(fileName);
 
     var encodedUri = encodeURI(csvContent);
     var link = document.getElementById("download-csv");
