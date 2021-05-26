@@ -5,7 +5,7 @@ window.addEventListener('DOMContentLoaded', () => {
 function uploadArchive(event) {
     event.preventDefault();
 
-    let zip =  getUploadedFile();
+    let zip = getUploadedFile();
     let zipName = zip['name'];
 
     const formData = new FormData();
@@ -16,7 +16,7 @@ function uploadArchive(event) {
         body: formData
     }).then(response => response.text())
         .then(text => {
-            document.querySelector('textarea').innerText = text;
+            document.querySelector('textarea').innerHTML = text;
             createCsvDownloadLink(text, zipName);
         });
 }
@@ -25,8 +25,8 @@ function getUploadedFile() {
     return document.getElementById('file-input').files[0];
 }
 
-function createCsvDownloadLink (csvContent, zipName){
-    let fileName = zipName.substring(0, zipName.length-3).concat("csv");
+function createCsvDownloadLink(csvContent, zipName) {
+    let fileName = zipName.substring(0, zipName.length - 3).concat("csv");
 
     console.log(fileName);
 
@@ -38,5 +38,4 @@ function createCsvDownloadLink (csvContent, zipName){
     document.getElementById("download-link-label").innerText = fileName;
 
     link.style.display = "inline";
-
 }
