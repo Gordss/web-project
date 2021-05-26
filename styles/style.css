@@ -70,44 +70,41 @@ textarea {
     border-color: #f76725;
     border-style: solid;
     cursor: pointer;
-  }
-  
-  #file-chosen{
+    display: inline;
+    float: right;
+    margin-right: 50px;
+}
+
+#file-chosen {
     margin-left: 0.3rem;
     font-family: sans-serif;
-  }
+}
 
-  #download-csv {
-      display: none;
-      float: right;
-      text-align: right;
-  }
+#download-csv {
+    display: none;
+    float: right;
+    text-align: right;
+}
 
-  #download-label {
-      display: inline;
-      float: left;
-  }
+#download-label {
+    display: inline;
+    float: left;
+}
 
-  #download-link-label:hover {
-      color: #f76725;
-  }
+#download-link-label:hover {
+    color: #f76725;
+}
 
-  #file-input-btn:hover {
+#file-input-btn:hover {
     color: white;
     background-color: #f76725;
-  }
+}
 
-  button {
-      font-size: large;
-      font-family: Segoe UI, Helvetica, Arial, sans-serif;
-  }
+button {
+    font-size: large;
+    font-family: Segoe UI, Helvetica, Arial, sans-serif;
+}
 
-  #file-input-btn {
-      display: inline;
-      float: right;
-      margin-right: 50px;
-  }
-
-  #file-input {
-      font-size: large;
-  }
+#file-input {
+    font-size: large;
+}
