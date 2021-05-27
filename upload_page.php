@@ -10,6 +10,11 @@
 <body>
 <header id="main-header">
     <a href=""><h1>Zip to ... Converter</h1></a>
+    <h3>Greetings,
+        <?php
+        session_start();
+        echo $_SESSION['username']; ?>
+    </h3>
     <nav>
         <ul id="navigation-list">
             <li>
