@@ -139,3 +139,9 @@ button {
     font-weight: bold;
     color: orange;
 }
+
+.error {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+}

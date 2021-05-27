@@ -52,7 +52,7 @@ class Storage
             $stmt = $this->conn->prepare('SELECT password FROM web_project.users WHERE username = ? AND password = ?');
             $stmt->execute([$username, $password]);
             $result = $stmt->fetch();
-            return sizeof($result) > 0;
+            return $result && sizeof($result) > 0;
         } catch (PDOException $e) {
             error_log($e->getMessage(), 3, 'errors.log');
             return false;

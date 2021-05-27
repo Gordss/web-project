@@ -8,9 +8,9 @@
     <script src="scripts/upload_archive.js"></script>
 </head>
 <body>
-<?php
-require 'header.php';
-?>
+<header id="main-header">
+    <a href=""><h1>Zip to ... Converter</h1></a>
+</header>
 <main>
     <?php
     session_start();
