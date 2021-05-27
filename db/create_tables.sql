@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS web_project.nodes (
     parent_name     VARCHAR(256),
     content_length  INT,
     type            VARCHAR(64),
+    md5_sum         VARCHAR(32),
 
     PRIMARY KEY (name,archive_id),
     CONSTRAINT `Parent name self key` FOREIGN KEY (parent_name) REFERENCES web_project.nodes (name)

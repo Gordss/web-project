@@ -37,7 +37,7 @@ function respondWithInternalServerError($reason)
 {
     http_response_code(500);
     echo 'Internal server error';
-    error_log($reason, 3, 'errors.log');
+    error_log($reason . '\n', 3, 'errors.log');
     die;
 }
 
