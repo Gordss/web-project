@@ -17,10 +17,10 @@ class Storage
         return self::$_instance;
     }
 
-    public function insertArchive($path, $archiveName, $userID)
+    public function insertArchive($path, $archiveName, $username)
     {
         $stmt = $this->conn->prepare('INSERT INTO web_project.archives (user_id) VALUES(?)');
-        $stmt->execute([$userID]);
+        $stmt->execute([$this->getUserIDByName($username)]);
         $archiveID = $this->conn->lastInsertId();
 
         $archive = new Archive($archiveName, $path);
@@ -56,6 +56,19 @@ class Storage
         } catch (PDOException $e) {
             error_log($e->getMessage(), 3, 'errors.log');
             return false;
+        }
+    }
+
+    private function getUserIDByName($username): string
+    {
+        try {
+            $stmt = $this->conn->prepare('SELECT id FROM web_project.users WHERE username = ?');
+            $stmt->execute([$username]);
+            $result = $stmt->fetch();
+            return $result ? $result['id'] : "";
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, 'errors.log');
+            return "";
         }
     }
 
