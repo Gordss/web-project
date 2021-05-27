@@ -145,3 +145,13 @@ button {
     font-weight: bold;
     text-align: center;
 }
+
+#options-fieldset {
+    width: 25%;
+    border: 1px solid orange;
+    margin-top: 1rem;
+}
+
+#options-fieldset label {
+    display: block;
+}

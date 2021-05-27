@@ -33,6 +33,28 @@
                             <h3>Choose a zip file to upload & convert to CSV:</h3>
                         </label>
                         <input id="file-input" type="file" name="file">
+                        <fieldset id="options-fieldset">
+                            <legend>Include fields</legend>
+                            <label>
+                                Name
+                                <input type="checkbox" name="include-name" checked/>
+                            </label>
+                            <label>
+                                Parent Name
+                                <input type="checkbox" name="include-parent-name" checked/>
+                            </label>
+                            <label>
+                                Content Length
+                                <input type="checkbox" name="include-content-length" checked/>
+                            </label>
+                            <label>
+                                Type
+                                <input type="checkbox" name="include-type" checked/>
+                            </label>
+                            <label>MD5 sum
+                                <input type="checkbox" name="include-md5_sum" checked/>
+                            </label>
+                        </fieldset>
                         <button id="file-input-btn" type="submit">Convert</button>
                     </form>
                 </section>

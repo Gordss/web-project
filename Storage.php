@@ -28,9 +28,8 @@ class Storage
 
         $sql = 'INSERT INTO web_project.nodes (archive_id, name, parent_name, content_length, type, md5_sum) VALUES(?, ?, ?, ?, ?, ?)';
         for ($i = 0; $i < sizeof($files); $i++) {
-            $file = $files[$i];
-            $this->conn->prepare($sql)->execute([$archiveID,
-                $file->getName(), $file->getParentName(), $file->getContentLength(), $file->getType(), $file->getMD5Sum()]);
+            $fields = array_merge([$archiveID], $files[$i]->getFields());
+            $this->conn->prepare($sql)->execute($fields);
         }
         return $archive;
     }

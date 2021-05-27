@@ -10,7 +10,14 @@ verifyFileType();
 try {
     $storage = Storage::getInstance();
     $archive = $storage->insertArchive($_FILES["file"]["tmp_name"], $_FILES['file']['name'], $username);
-    echo $archive->toCSV();
+    $options = [
+        'include-name' => isset($_POST['include-name']) && $_POST['include-name'] === 'on',
+        'include-parent-name' => isset($_POST['include-parent-name']) && $_POST['include-parent-name'] === 'on',
+        'include-content-length' => isset($_POST['include-content-length']) && $_POST['include-content-length'] === 'on',
+        'include-type' => isset($_POST['include-type']) && $_POST['include-type'] === 'on',
+        'include-md5_sum' => isset($_POST['include-md5_sum']) && $_POST['include-md5_sum'] === 'on',
+    ];
+    echo $archive->toCSV($options);
 } catch (Exception $e) {
     respondWithInternalServerError($e->getMessage());
 }

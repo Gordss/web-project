@@ -10,7 +10,7 @@ function uploadArchive(event) {
         return;
     }
 
-    const formData = new FormData();
+    const formData = new FormData(document.querySelector('form'));
     formData.append('file', zip);
 
     fetch('upload.php', {

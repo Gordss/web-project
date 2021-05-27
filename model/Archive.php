@@ -34,13 +34,18 @@ class Archive
         usort($this->files, "Archive::cmpFiles");
     }
 
-    public function toCSV(): string
+    public function toCSV($options): string
     {
-        $csv = "name,parent_name,content_length,type, md5_sum" . PHP_EOL;
+        $csv = '';
+        foreach ($options as $option => $shouldInclude) {
+            if ($shouldInclude) {
+                $csv .= str_replace('include-', '', $option) . ',';
+            }
+        }
+        $csv = rtrim($csv, ',') . PHP_EOL;
+
         foreach ($this->files as $file) {
-            $fields = array($file->getName(), $file->getParentName(), $file->getContentLength(), $file->getType(),
-                $file->getMD5Sum());
-            $csv .= implode(",", $fields) . PHP_EOL;
+            $csv .= implode(",", $file->getFields($options)) . PHP_EOL;
         }
         return $csv;
     }
