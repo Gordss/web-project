@@ -1,4 +1,5 @@
-var currentTypeIndex = undefined;
+var currentTypeIndex = undefined,
+    currentDelimiter = ',';
 
 window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('form').addEventListener('submit', uploadArchive);
@@ -22,6 +23,13 @@ function uploadArchive(event) {
         return;
     }
 
+    const customDelimiter = document.querySelector('input[name=delimiter]').value;
+    if (customDelimiter.length === 1) {
+        currentDelimiter = customDelimiter;
+    } else {
+        currentDelimiter = ',';
+    }
+
     const formData = new FormData(document.querySelector('form'));
     formData.append('file', zip);
 
@@ -40,6 +48,7 @@ function uploadArchive(event) {
                 lineElement.style.color = getColourForLine(line);
                 lineElement.innerHTML = line;
                 resultPlaceholder.appendChild(lineElement);
+                resultPlaceholder.appendChild(document.createElement('br'));
             })
             if (response.status === 200) {
                 createCsvDownloadLink(text, zip['name']);
@@ -49,36 +58,32 @@ function uploadArchive(event) {
 }
 
 function setTypeIndex(headerLine) {
-    const fields = headerLine.split(',');
+    const fields = headerLine.trim().split(currentDelimiter);
     for (let i = 0; i < fields.length; i++) {
         if (fields[i] === 'type') {
             currentTypeIndex = i;
             return;
         }
+        currentTypeIndex = undefined;
     }
-    currentTypeIndex = undefined;
 }
 
 function getColourForLine(line) {
     const defaultColor = document.getElementById('default-color').value;
-    if (!currentTypeIndex) {
+    if (typeof currentTypeIndex !== 'number') {
         return defaultColor;
     }
-    switch (line.split(',')[currentTypeIndex].toLowerCase()) {
-        case 'txt':
-        case 'md':
-        case 'doc':
-        case 'docx':
-            return document.getElementById('txt-files-color').value;
-        case 'jpg':
-        case 'png':
-        case 'gif':
-            return document.getElementById('img-files-color').value;
-        case 'directory':
-            return document.getElementById('dir-files-color').value;
-        default:
-            return defaultColor;
+    const fileType = line.split(currentDelimiter)[currentTypeIndex].trimEnd().toLowerCase();
+    if (['txt', 'md', 'doc', 'docx'].includes(fileType)) {
+        return document.getElementById('txt-files-color').value;
     }
+    if (['jpg', 'png', 'gif'].includes(fileType)) {
+        return document.getElementById('img-files-color').value;
+    }
+    if ('directory' === fileType) {
+        return document.getElementById('dir-files-color').value;
+    }
+    return defaultColor;
 }
 
 function getUploadedFile() {

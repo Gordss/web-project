@@ -82,6 +82,7 @@
                                 <label>Include header
                                     <input type="checkbox" name="include-header" checked/>
                                 </label>
+                                <input type="text" name="delimiter" placeholder="Custom delimiter" maxlength="1">
                             </fieldset>
                         </div>
                         <button id="file-input-btn" type="submit">Convert</button>
