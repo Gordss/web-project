@@ -6,7 +6,6 @@ if (!isset($_FILES['file'])) {
     respondWithBadRequest('No file uploaded');
 }
 
-
 verifyFileType();
 try {
     $storage = Storage::getInstance();

@@ -13,10 +13,7 @@
     <nav>
         <ul id="navigation-list">
             <li>
-                <a href="index.html">Nav1</a>
-            </li>
-            <li>
-                <a href="index.html">Nav2</a>
+                <a href="logout.php">Log out</a>
             </li>
         </ul>
     </nav>

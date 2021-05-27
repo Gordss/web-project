@@ -35,6 +35,30 @@ class Storage
         return $archive;
     }
 
+    public function registerUser($username, $password): string
+    {
+        try {
+            $this->conn->prepare('INSERT INTO web_project.users (username,password) VALUES (?, ?)')
+                ->execute([$username, $password]);
+        } catch (PDOException $e) {
+            return $e->getMessage();
+        }
+        return "";
+    }
+
+    public function verifyUserCredentials($username, $password): bool
+    {
+        try {
+            $stmt = $this->conn->prepare('SELECT password FROM web_project.users WHERE username = ? AND password = ?');
+            $stmt->execute([$username, $password]);
+            $result = $stmt->fetch();
+            return sizeof($result) > 0;
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, 'errors.log');
+            return false;
+        }
+    }
+
     private function __construct()
     {
         $this->conn = new PDO("mysql:host=localhost", "root", "");
