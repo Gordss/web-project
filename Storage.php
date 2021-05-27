@@ -17,10 +17,10 @@ class Storage
         return self::$_instance;
     }
 
-    public function insertArchive($path, $archiveName, $userID)
+    public function insertArchive($path, $archiveName, $username)
     {
         $stmt = $this->conn->prepare('INSERT INTO web_project.archives (user_id) VALUES(?)');
-        $stmt->execute([$userID]);
+        $stmt->execute([$this->getUserIDByName($username)]);
         $archiveID = $this->conn->lastInsertId();
 
         $archive = new Archive($archiveName, $path);
@@ -33,6 +33,43 @@ class Storage
                 $archiveID, $file->getName(), $file->getParentName(), $file->getContentLength(), $file->getType()]);
         }
         return $archive;
+    }
+
+    public function registerUser($username, $password): string
+    {
+        try {
+            $this->conn->prepare('INSERT INTO web_project.users (username,password) VALUES (?, ?)')
+                ->execute([$username, $password]);
+        } catch (PDOException $e) {
+            return $e->getMessage();
+        }
+        return "";
+    }
+
+    public function verifyUserCredentials($username, $password): bool
+    {
+        try {
+            $stmt = $this->conn->prepare('SELECT password FROM web_project.users WHERE username = ? AND password = ?');
+            $stmt->execute([$username, $password]);
+            $result = $stmt->fetch();
+            return $result && sizeof($result) > 0;
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, 'errors.log');
+            return false;
+        }
+    }
+
+    private function getUserIDByName($username): string
+    {
+        try {
+            $stmt = $this->conn->prepare('SELECT id FROM web_project.users WHERE username = ?');
+            $stmt->execute([$username]);
+            $result = $stmt->fetch();
+            return $result ? $result['id'] : "";
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, 'errors.log');
+            return "";
+        }
     }
 
     private function __construct()

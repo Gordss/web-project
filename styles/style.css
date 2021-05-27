@@ -108,3 +108,40 @@ button {
 #file-input {
     font-size: large;
 }
+
+.credentials-section {
+    width: 20%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+}
+
+.credentials-form {
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20%;
+}
+
+.credentials-form input {
+    color: orange;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.credentials-section p {
+    text-align: center;
+}
+
+.credentials-section p a {
+    font-weight: bold;
+    color: orange;
+}
+
+.error {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+}

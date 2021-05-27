@@ -5,12 +5,11 @@ require "Storage.php";
 if (!isset($_FILES['file'])) {
     respondWithBadRequest('No file uploaded');
 }
-
-
+$username = authenticateUser();
 verifyFileType();
 try {
     $storage = Storage::getInstance();
-    $archive = $storage->insertArchive($_FILES["file"]["tmp_name"], $_FILES['file']['name'], 1);
+    $archive = $storage->insertArchive($_FILES["file"]["tmp_name"], $_FILES['file']['name'], $username);
     echo $archive->toCSV();
 } catch (Exception $e) {
     respondWithInternalServerError($e->getMessage());
@@ -40,4 +39,15 @@ function respondWithInternalServerError($reason)
     echo 'Internal server error';
     error_log($reason, 3, 'errors.log');
     die;
+}
+
+function authenticateUser()
+{
+    session_start();
+    if (!isset($_SESSION['username'])) {
+        http_response_code(401);
+        header('Location: login.php');
+        die;
+    }
+    return $_SESSION['username'];
 }
