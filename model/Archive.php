@@ -37,12 +37,14 @@ class Archive
     public function toCSV($options): string
     {
         $csv = '';
-        foreach ($options as $option => $shouldInclude) {
-            if ($shouldInclude) {
-                $csv .= str_replace('include-', '', $option) . ',';
+        if ($options['include-header']) {
+            foreach ($options as $option => $shouldInclude) {
+                if ($shouldInclude) {
+                    $csv .= str_replace('include-', '', $option) . ',';
+                }
             }
+            $csv = rtrim($csv, ',') . PHP_EOL;
         }
-        $csv = rtrim($csv, ',') . PHP_EOL;
 
         foreach ($this->files as $file) {
             $csv .= implode(",", $file->getFields($options)) . PHP_EOL;

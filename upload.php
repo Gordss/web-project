@@ -16,6 +16,8 @@ try {
         'include-content-length' => isset($_POST['include-content-length']) && $_POST['include-content-length'] === 'on',
         'include-type' => isset($_POST['include-type']) && $_POST['include-type'] === 'on',
         'include-md5_sum' => isset($_POST['include-md5_sum']) && $_POST['include-md5_sum'] === 'on',
+
+        'include-header' => isset($_POST['include-header']) && $_POST['include-header'] === 'on'
     ];
     echo $archive->toCSV($options);
 } catch (Exception $e) {

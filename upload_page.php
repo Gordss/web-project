@@ -33,7 +33,7 @@
                             <h3>Choose a zip file to upload & convert to CSV:</h3>
                         </label>
                         <input id="file-input" type="file" name="file">
-                        <div id="options">
+                        <div class="options-container">
                             <fieldset id="include-options-fieldset">
                                 <legend>Include fields</legend>
                                 <label>
@@ -73,6 +73,14 @@
                                 <label>
                                     Default
                                     <input id="default-color" type="color"/>
+                                </label>
+                            </fieldset>
+                        </div>
+                        <div class="options-container">
+                            <fieldset id="additional-options">
+                                <legend>Additional options</legend>
+                                <label>Include header
+                                    <input type="checkbox" name="include-header" checked/>
                                 </label>
                             </fieldset>
                         </div>

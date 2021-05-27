@@ -143,17 +143,21 @@ td {
     text-align: center;
 }
 
-#options {
+.options-container {
     display: flex;
     justify-content: space-evenly;
 }
 
-#options fieldset {
+.options-container fieldset {
     width: 40%;
     border: 1px solid orange;
     margin-top: 1rem;
 }
 
-#options label {
+.options-container label {
     display: block;
+}
+
+.options-container #additional-options {
+    width: 80%;
 }
