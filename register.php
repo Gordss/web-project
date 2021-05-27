@@ -31,6 +31,7 @@
         $error = Storage::getInstance()->registerUser($username, $password);
         if (empty($error)) {
             header('Location: login.php');
+            die;
         }
         ?>
         <div class="error">Registration unsuccessful: Username is already taken</div>

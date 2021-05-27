@@ -5,7 +5,7 @@ require "Storage.php";
 if (!isset($_FILES['file'])) {
     respondWithBadRequest('No file uploaded');
 }
-
+authenticateUser();
 verifyFileType();
 try {
     $storage = Storage::getInstance();
@@ -39,4 +39,14 @@ function respondWithInternalServerError($reason)
     echo 'Internal server error';
     error_log($reason, 3, 'errors.log');
     die;
+}
+
+function authenticateUser()
+{
+    session_start();
+    if (!isset($_SESSION['username'])) {
+        http_response_code(401);
+        header('Location: login.php');
+        die;
+    }
 }
