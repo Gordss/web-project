@@ -34,6 +34,21 @@ class Storage
         return $archive;
     }
 
+    public function fetchArchivesForUser($username): array
+    {
+        $stmt = $this->conn->prepare('SELECT * FROM web_project.archives WHERE user_id = ?');
+        $stmt->execute([$this->getUserIDByName($username)]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private function fetchArchiveByID($archiveID): Archive
+    {
+        $stmt = $this->conn->prepare('SELECT * FROM web_project.nodes WHERE archive_id = ?');
+        $stmt->execute([$archiveID]);
+        $nodes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        var_dump($nodes);
+    }
+
     public function registerUser($username, $password): string
     {
         try {
