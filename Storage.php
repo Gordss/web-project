@@ -98,9 +98,14 @@ class Storage
     {
         $host = getenv('DB_HOST') ?: 'localhost';
         $db = getenv('DB_NAME') ?: 'web_project';
-        $this->conn = new PDO("mysql:dbname=$db;host=$host", getenv('DB_USER') ?: 'root', getenv('DB_PASS') ?: '');
+        try {
+            $this->conn = new PDO("mysql:dbname=$db;host=$host", getenv('DB_USER') ?: 'root', getenv('DB_PASS') ?: '');
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, 'errors.log');
+            http_response_code(500);
+            die;
+        }
 
-        $this->conn->exec("CREATE DATABASE IF NOT EXISTS $db; USE $db");
         $this->ensureTables();
     }
 

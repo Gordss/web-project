@@ -15,3 +15,7 @@ History of uploaded archives is persisted for every user
 
 If local XAMPP setup is used, the only precondition is to create a database called
 `web_project`. The default root user without password will be used.
+
+## Logs
+Error logs are generated in a file called `errors.log`, located in the root
+folder of the project. If it does not exist, it is automatically generated when the first error is logged.
