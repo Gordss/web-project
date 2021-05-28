@@ -26,11 +26,10 @@ class Storage
         $archive = new Archive($archiveName, $path);
         $files = $archive->getFiles();
 
-        $sql = 'INSERT INTO web_project.nodes (archive_id, name, parent_name, content_length, type) VALUES(?, ?, ?, ?, ?)';
+        $sql = 'INSERT INTO web_project.nodes (archive_id, name, parent_name, content_length, type, md5_sum) VALUES(?, ?, ?, ?, ?, ?)';
         for ($i = 0; $i < sizeof($files); $i++) {
-            $file = $files[$i];
-            $this->conn->prepare($sql)->execute([
-                $archiveID, $file->getName(), $file->getParentName(), $file->getContentLength(), $file->getType()]);
+            $fields = array_merge([$archiveID], $files[$i]->getFields());
+            $this->conn->prepare($sql)->execute($fields);
         }
         return $archive;
     }

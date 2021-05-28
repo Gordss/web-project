@@ -12,12 +12,12 @@ class Archive
         if (!$zip->open($path)) {
             throw new Exception('Could not open zip archive at ' . $path);
         }
-        $this->parseArchive($zip, $archiveName);
+        $this->parseArchive($zip, $archiveName, $path);
     }
 
-    private function parseArchive($zip, $archiveName)
+    private function parseArchive($zip, $archiveName, $path)
     {
-        $this->files = array(new File($archiveName, null, 0, DIRECTORY_TYPE));
+        $this->files = array(new File($archiveName, null, 0, DIRECTORY_TYPE, md5_file($path)));
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $filePath = pathinfo($zip->getNameIndex($i));
             if ($filePath['dirname'] === '.') {
@@ -27,18 +27,22 @@ class Archive
             }
             $dir = $filePath['dirname'];
             $baseName = $filePath['basename'];
-            $file = new File("$dir/$baseName", $dir, strlen($zip->getFromIndex($i)), $filePath['extension'] ?? DIRECTORY_TYPE);
+            $fileContent = $zip->getFromIndex($i);
+            $file = new File("$dir/$baseName", $dir, strlen($fileContent), $filePath['extension'] ?? DIRECTORY_TYPE, md5($fileContent));
             array_push($this->files, $file);
         }
         usort($this->files, "Archive::cmpFiles");
     }
 
-    public function toCSV(): string
+    public function toCSV($options): string
     {
-        $csv = "name,parent_name,content_length,type" . PHP_EOL;
+        $csv = '';
+        if ($options['include-header']) {
+            $csv = implode($options['delimiter'], $options['included-fields']) . PHP_EOL;
+        }
+
         foreach ($this->files as $file) {
-            $fields = array($file->getName(), $file->getParentName(), $file->getContentLength(), $file->getType());
-            $csv .= implode(",", $fields) . PHP_EOL;
+            $csv .= implode($options['delimiter'], $file->getFields($options['included-fields'])) . PHP_EOL;
         }
         return $csv;
     }

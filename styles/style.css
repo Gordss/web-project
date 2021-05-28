@@ -57,22 +57,24 @@ td {
     padding-top: 30px;
 }
 
-textarea {
+#csv-result-placeholder {
     width: 100%;
     height: 90%;
     overflow-y: scroll;
     color: #22272E;
+    background-color: white;
 }
 
 #file-input-btn {
-    color: #f76725;
+    color: orange;
     background-color: white;
-    border-color: #f76725;
-    border-style: solid;
+    border: medium solid orange;
+    border-radius: 5px;
     cursor: pointer;
-    display: inline;
-    float: right;
-    margin-right: 50px;
+    display: block;
+    margin: 16px auto;
+    font-size: large;
+    font-family: Segoe UI, Helvetica, Arial, sans-serif;
 }
 
 #file-chosen {
@@ -97,16 +99,18 @@ textarea {
 
 #file-input-btn:hover {
     color: white;
-    background-color: #f76725;
-}
-
-button {
-    font-size: large;
-    font-family: Segoe UI, Helvetica, Arial, sans-serif;
+    background-color: orange;
 }
 
 #file-input {
     font-size: large;
+}
+
+label[for=file-input] {
+    display: block;
+    font-weight: bold;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
 }
 
 .credentials-section {
@@ -144,4 +148,17 @@ button {
     color: red;
     font-weight: bold;
     text-align: center;
+}
+
+.options-fieldset {
+    width: 90%;
+    border: 1px solid orange;
+    margin-top: 1rem;
+}
+
+.options-fieldset textarea {
+    width: 100%;
+    color: black;
+    overflow-y: scroll;
+    resize: none;
 }

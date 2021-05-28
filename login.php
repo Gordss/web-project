@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TODO add title</title>
+    <title>Zip to CSV Converter</title>
     <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
 <header id="main-header">
-    <a href=""><h1>Zip to ... Converter</h1></a>
+    <a href=""><h1>Zip to CSV Converter</h1></a>
 </header>
 <main>
     <section class="credentials-section">
