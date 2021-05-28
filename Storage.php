@@ -34,6 +34,29 @@ class Storage
         return $archive;
     }
 
+    public function fetchArchivesForUser($username): array
+    {
+        $stmt = $this->conn->prepare('SELECT * FROM web_project.archives WHERE user_id = ?');
+        $stmt->execute([$this->getUserIDByName($username)]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getArchiveCSV($archiveID)
+    {
+        $sql = 'SELECT name,parent_name,content_length,type,md5_sum FROM web_project.nodes WHERE archive_id = ?';
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$archiveID]);
+        $nodes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (sizeof($nodes) == 0) {
+            return null;
+        }
+        $csv = 'name,parent-name,content-length,type,md5_sum' . PHP_EOL;
+        foreach ($nodes as $node) {
+            $csv .= implode(',', $node) . PHP_EOL;
+        }
+        return $csv;
+    }
+
     public function registerUser($username, $password): string
     {
         try {

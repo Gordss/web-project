@@ -18,6 +18,12 @@
     <nav>
         <ul id="navigation-list">
             <li>
+                <a href="upload_page.php">Upload</a>
+            </li>
+            <li>
+                <a href="history.php">Upload history</a>
+            </li>
+            <li>
                 <a href="logout.php">Log out</a>
             </li>
         </ul>

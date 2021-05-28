@@ -1,0 +1,28 @@
+table caption {
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+table {
+    width: 90%;
+    margin-top: 1rem;
+    border-collapse: collapse;
+}
+
+td {
+    height: fit-content;
+    padding-top: 1rem;
+    border: 1px solid whitesmoke;
+    text-align: center;
+    padding-bottom: 0.25rem;
+    width: 25%;
+}
+
+table tr:first-child td {
+    font-weight: bold;
+}
+
+.archive-csv-link {
+    color: orange;
+}
