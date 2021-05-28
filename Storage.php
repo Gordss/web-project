@@ -19,14 +19,14 @@ class Storage
 
     public function insertArchive($path, $archiveName, $username)
     {
-        $stmt = $this->conn->prepare('INSERT INTO web_project.archives (user_id) VALUES(?)');
+        $stmt = $this->conn->prepare('INSERT INTO archives (user_id) VALUES(?)');
         $stmt->execute([$this->getUserIDByName($username)]);
         $archiveID = $this->conn->lastInsertId();
 
         $archive = new Archive($archiveName, $path);
         $files = $archive->getFiles();
 
-        $sql = 'INSERT INTO web_project.nodes (archive_id, name, parent_name, content_length, type, md5_sum) VALUES(?, ?, ?, ?, ?, ?)';
+        $sql = 'INSERT INTO nodes (archive_id, name, parent_name, content_length, type, md5_sum) VALUES(?, ?, ?, ?, ?, ?)';
         for ($i = 0; $i < sizeof($files); $i++) {
             $fields = array_merge([$archiveID], $files[$i]->getFields());
             $this->conn->prepare($sql)->execute($fields);
@@ -36,14 +36,14 @@ class Storage
 
     public function fetchArchivesForUser($username): array
     {
-        $stmt = $this->conn->prepare('SELECT * FROM web_project.archives WHERE user_id = ?');
+        $stmt = $this->conn->prepare('SELECT * FROM archives WHERE user_id = ?');
         $stmt->execute([$this->getUserIDByName($username)]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getArchiveCSV($archiveID)
     {
-        $sql = 'SELECT name,parent_name,content_length,type,md5_sum FROM web_project.nodes WHERE archive_id = ?';
+        $sql = 'SELECT name,parent_name,content_length,type,md5_sum FROM nodes WHERE archive_id = ?';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$archiveID]);
         $nodes = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -60,7 +60,7 @@ class Storage
     public function registerUser($username, $password): string
     {
         try {
-            $this->conn->prepare('INSERT INTO web_project.users (username,password) VALUES (?, ?)')
+            $this->conn->prepare('INSERT INTO users (username,password) VALUES (?, ?)')
                 ->execute([$username, $password]);
         } catch (PDOException $e) {
             return $e->getMessage();
@@ -71,7 +71,7 @@ class Storage
     public function verifyUserCredentials($username, $password): bool
     {
         try {
-            $stmt = $this->conn->prepare('SELECT password FROM web_project.users WHERE username = ? AND password = ?');
+            $stmt = $this->conn->prepare('SELECT password FROM users WHERE username = ? AND password = ?');
             $stmt->execute([$username, $password]);
             $result = $stmt->fetch();
             return $result && sizeof($result) > 0;
@@ -84,7 +84,7 @@ class Storage
     private function getUserIDByName($username): string
     {
         try {
-            $stmt = $this->conn->prepare('SELECT id FROM web_project.users WHERE username = ?');
+            $stmt = $this->conn->prepare('SELECT id FROM users WHERE username = ?');
             $stmt->execute([$username]);
             $result = $stmt->fetch();
             return $result ? $result['id'] : "";
@@ -96,7 +96,11 @@ class Storage
 
     private function __construct()
     {
-        $this->conn = new PDO("mysql:host=localhost", "root", "");
+        $host = getenv('DB_HOST') ?: 'localhost';
+        $db = getenv('DB_NAME') ?: 'web_project';
+        $this->conn = new PDO("mysql:dbname=$db;host=$host", getenv('DB_USER') ?: 'root', getenv('DB_PASS') ?: '');
+
+        $this->conn->exec("CREATE DATABASE IF NOT EXISTS $db; USE $db");
         $this->ensureTables();
     }
 
