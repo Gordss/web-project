@@ -29,13 +29,21 @@ function uploadArchive(event) {
         method: 'POST',
         body: formData
     }).then(response => {
-        const options = JSON.parse(response.headers.get('X-Applied-Options'));
-        delimiter = options.delimiter ? options.delimiter : ',';
-        typeIndex = options['included-fields'] ? options['included-fields'].indexOf('type') : -1;
-
         response.text().then(text => {
             const resultPlaceholder = document.getElementById('csv-result-placeholder');
             resultPlaceholder.innerHTML = '';
+
+            if (response.status !== 200) {
+                resultPlaceholder.innerHTML = text;
+                resultPlaceholder.style.color = 'red';
+                return;
+            }
+            resultPlaceholder.style.color = 'white';
+
+            const options = JSON.parse(response.headers.get('X-Applied-Options'));
+            delimiter = options.delimiter ? options.delimiter : ',';
+            typeIndex = options['included-fields'] ? options['included-fields'].indexOf('type') : -1;
+
             const lines = text.split("\n");
             lines.pop(); // There is an empty line in the end
             lines.forEach(line => {
@@ -45,9 +53,7 @@ function uploadArchive(event) {
                 resultPlaceholder.appendChild(lineElement);
                 resultPlaceholder.appendChild(document.createElement('br'));
             })
-            if (response.status === 200) {
-                createCsvDownloadLink(text, zip['name']);
-            }
+            createCsvDownloadLink(text, zip['name']);
         });
     })
 }
