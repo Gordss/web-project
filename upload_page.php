@@ -13,6 +13,9 @@
     <h3>Greetings,
         <?php
         session_start();
+        if (!isset($_SESSION['username'])) {
+            header('Location: login.php');
+        }
         echo $_SESSION['username']; ?>
     </h3>
     <nav>

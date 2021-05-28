@@ -11,10 +11,13 @@
 </head>
 <body>
 <header id="main-header">
-    <a href=""><h1>Zip to CSV Converter</h1></a>
+    <a href="upload_page.php"><h1>Zip to CSV Converter</h1></a>
     <h3>Greetings,
         <?php
         session_start();
+        if (!isset($_SESSION['username'])) {
+            header('Location: login.php');
+        }
         echo $_SESSION['username']; ?>
     </h3>
     <nav>
