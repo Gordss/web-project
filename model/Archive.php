@@ -38,17 +38,11 @@ class Archive
     {
         $csv = '';
         if ($options['include-header']) {
-            $fieldOptions = array('include-name', 'include-parent-name', 'include-content-length', 'include-type', 'include-md5_sum');
-            foreach ($fieldOptions as $option) {
-                if ($options[$option]) {
-                    $csv .= str_replace('include-', '', $option) . $options['delimiter'];
-                }
-            }
-            $csv = rtrim($csv, $options['delimiter']) . PHP_EOL;
+            $csv = implode($options['delimiter'], $options['included-fields']) . PHP_EOL;
         }
 
         foreach ($this->files as $file) {
-            $csv .= implode($options['delimiter'], $file->getFields($options)) . PHP_EOL;
+            $csv .= implode($options['delimiter'], $file->getFields($options['included-fields'])) . PHP_EOL;
         }
         return $csv;
     }

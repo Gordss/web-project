@@ -29,62 +29,31 @@
             <td>
                 <section>
                     <form enctype="multipart/form-data">
-                        <label>
-                            <h3>Choose a zip file to upload & convert to CSV:</h3>
-                        </label>
+                        <label for="file-input">Choose a zip file to upload & convert to CSV:</label>
                         <input id="file-input" type="file" name="file">
-                        <div class="options-container">
-                            <fieldset id="include-options-fieldset">
-                                <legend>Include fields</legend>
-                                <label>
-                                    Name
-                                    <input type="checkbox" name="include-name" checked/>
-                                </label>
-                                <label>
-                                    Parent Name
-                                    <input type="checkbox" name="include-parent-name" checked/>
-                                </label>
-                                <label>
-                                    Content Length
-                                    <input type="checkbox" name="include-content-length" checked/>
-                                </label>
-                                <label>
-                                    Type
-                                    <input type="checkbox" name="include-type" checked/>
-                                </label>
-                                <label>MD5 sum
-                                    <input type="checkbox" name="include-md5_sum" checked/>
-                                </label>
-                            </fieldset>
-                            <fieldset>
-                                <legend>Visualization options</legend>
-                                <label>
-                                    Text files
-                                    <input id="txt-files-color" type="color"/>
-                                </label>
-                                <label>
-                                    Image files
-                                    <input id="img-files-color" type="color"/>
-                                </label>
-                                <label>
-                                    Directories
-                                    <input id="dir-files-color" type="color"/>
-                                </label>
-                                <label>
-                                    Default
-                                    <input id="default-color" type="color"/>
-                                </label>
-                            </fieldset>
-                        </div>
-                        <div class="options-container">
-                            <fieldset id="additional-options">
-                                <legend>Additional options</legend>
-                                <label>Include header
-                                    <input type="checkbox" name="include-header" checked/>
-                                </label>
-                                <input type="text" name="delimiter" placeholder="Custom delimiter" maxlength="1">
-                            </fieldset>
-                        </div>
+                        <fieldset class="options-fieldset">
+                            <legend>Conversion Options</legend>
+                            <textarea id="options-input" name="options" cols="40" rows="20"></textarea>
+                        </fieldset>
+                        <fieldset class="options-fieldset">
+                            <legend>Visualization options</legend>
+                            <label>
+                                Text files
+                                <input id="txt-files-color" type="color"/>
+                            </label>
+                            <label>
+                                Image files
+                                <input id="img-files-color" type="color"/>
+                            </label>
+                            <label>
+                                Directories
+                                <input id="dir-files-color" type="color"/>
+                            </label>
+                            <label>
+                                Default
+                                <input id="default-color" type="color"/>
+                            </label>
+                        </fieldset>
                         <button id="file-input-btn" type="submit">Convert</button>
                     </form>
                 </section>
@@ -93,9 +62,7 @@
             <td>
                 <h3 id="download-label">Converted CSV file:</h3>
                 <a id="download-csv"><h3 id="download-link-label"></h3></a>
-                <p id="csv-result-placeholder">
-
-                </p>
+                <p id="csv-result-placeholder"></p>
             </td>
         </tr>
     </table>

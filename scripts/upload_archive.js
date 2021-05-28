@@ -1,5 +1,4 @@
-var currentTypeIndex = undefined,
-    currentDelimiter = ',';
+var delimiter = ',', typeIndex = -1;
 
 window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('form').addEventListener('submit', uploadArchive);
@@ -11,7 +10,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function onColorChange() {
     document.querySelectorAll('#csv-result-placeholder span').forEach(span => {
-        span.style.color = getColourForLine(span.innerHTML);
+        span.style.color = getColourForLine(span.innerHTML, delimiter, typeIndex);
     });
 }
 
@@ -23,13 +22,6 @@ function uploadArchive(event) {
         return;
     }
 
-    const customDelimiter = document.querySelector('input[name=delimiter]').value;
-    if (customDelimiter.length === 1) {
-        currentDelimiter = customDelimiter;
-    } else {
-        currentDelimiter = ',';
-    }
-
     const formData = new FormData(document.querySelector('form'));
     formData.append('file', zip);
 
@@ -37,15 +29,18 @@ function uploadArchive(event) {
         method: 'POST',
         body: formData
     }).then(response => {
+        const options = JSON.parse(response.headers.get('X-Applied-Options'));
+        delimiter = options.delimiter ? options.delimiter : ',';
+        typeIndex = options['included-fields'] ? options['included-fields'].indexOf('type') : -1;
+
         response.text().then(text => {
             const resultPlaceholder = document.getElementById('csv-result-placeholder');
             resultPlaceholder.innerHTML = '';
             const lines = text.split("\n");
             lines.pop(); // There is an empty line in the end
-            setTypeIndex(lines[0]);
             lines.forEach(line => {
                 const lineElement = document.createElement('span');
-                lineElement.style.color = getColourForLine(line);
+                lineElement.style.color = getColourForLine(line, delimiter, typeIndex);
                 lineElement.innerHTML = line;
                 resultPlaceholder.appendChild(lineElement);
                 resultPlaceholder.appendChild(document.createElement('br'));
@@ -57,23 +52,12 @@ function uploadArchive(event) {
     })
 }
 
-function setTypeIndex(headerLine) {
-    const fields = headerLine.trim().split(currentDelimiter);
-    for (let i = 0; i < fields.length; i++) {
-        if (fields[i] === 'type') {
-            currentTypeIndex = i;
-            return;
-        }
-        currentTypeIndex = undefined;
-    }
-}
-
-function getColourForLine(line) {
+function getColourForLine(line, delimiter, typeIndex) {
     const defaultColor = document.getElementById('default-color').value;
-    if (typeof currentTypeIndex !== 'number') {
+    if (typeIndex < 0) {
         return defaultColor;
     }
-    const fileType = line.split(currentDelimiter)[currentTypeIndex].trimEnd().toLowerCase();
+    const fileType = line.split(delimiter)[typeIndex].trimEnd().toLowerCase();
     if (['txt', 'md', 'doc', 'docx'].includes(fileType)) {
         return document.getElementById('txt-files-color').value;
     }
