@@ -96,9 +96,11 @@ class Storage
 
     private function __construct()
     {
-        $host = getenv('DB_HOST');
-        $db = getenv('DB_NAME');
-        $this->conn = new PDO("mysql:dbname=$db;host=$host", getenv('DB_USER'), getenv('DB_PASS'));
+        $host = getenv('DB_HOST') ?: 'localhost';
+        $db = getenv('DB_NAME') ?: 'web_project';
+        $this->conn = new PDO("mysql:dbname=$db;host=$host", getenv('DB_USER') ?: 'root', getenv('DB_PASS') ?: '');
+
+        $this->conn->exec("CREATE DATABASE IF NOT EXISTS $db; USE $db");
         $this->ensureTables();
     }
 
