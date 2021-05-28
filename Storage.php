@@ -41,12 +41,20 @@ class Storage
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    private function fetchArchiveByID($archiveID): Archive
+    public function getArchiveCSV($archiveID)
     {
-        $stmt = $this->conn->prepare('SELECT * FROM web_project.nodes WHERE archive_id = ?');
+        $sql = 'SELECT name,parent_name,content_length,type,md5_sum FROM web_project.nodes WHERE archive_id = ?';
+        $stmt = $this->conn->prepare($sql);
         $stmt->execute([$archiveID]);
         $nodes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        var_dump($nodes);
+        if (sizeof($nodes) == 0) {
+            return null;
+        }
+        $csv = 'name,parent-name,content-length,type,md5_sum' . PHP_EOL;
+        foreach ($nodes as $node) {
+            $csv .= implode(',', $node) . PHP_EOL;
+        }
+        return $csv;
     }
 
     public function registerUser($username, $password): string

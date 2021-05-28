@@ -2,6 +2,19 @@
 
 require "Storage.php";
 
+if ($_SERVER['REQUEST_METHOD'] === 'GET') { // Gets a previously uploaded archive's CSV representation
+    if (!isset($_GET['id'])) {
+        respondWithBadRequest('Missing ID query parameter');
+    }
+    $id = $_GET['id'];
+    $archiveCSV = Storage::getInstance()->getArchiveCSV($id);
+    if (!$archiveCSV) {
+        respondWithNotFound("Archive with ID $id not found");
+    }
+    echo $archiveCSV;
+    die;
+}
+
 const DEFAULT_OPTIONS = array(
     'included-fields' => array('name', 'parent-name', 'content-length', 'type', 'md5_sum'),
     'include-header' => true,
@@ -68,6 +81,13 @@ function parseOptions(): array
 function respondWithBadRequest($reason)
 {
     http_response_code(400);
+    echo $reason;
+    die;
+}
+
+function respondWithNotFound($reason)
+{
+    http_response_code(404);
     echo $reason;
     die;
 }

@@ -25,7 +25,7 @@ function uploadArchive(event) {
     const formData = new FormData(document.querySelector('form'));
     formData.append('file', zip);
 
-    fetch('upload.php', {
+    fetch('archive.php', {
         method: 'POST',
         body: formData
     }).then(response => {

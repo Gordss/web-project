@@ -6,6 +6,8 @@
 
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet" href="styles/history.css">
+
+    <script src="scripts/history.js"></script>
 </head>
 <body>
 <header id="main-header">
@@ -35,7 +37,7 @@
         <tr>
             <td>Archive ID</td>
             <td>Uploaded at</td>
-            <td>More</td>
+            <td>Download</td>
         </tr>
         <?php
         require "Storage.php";
@@ -47,7 +49,7 @@
             <tr>
                 <td>$id</td>
                 <td>$time</td>
-                <td><a href="archive.php?id=$id">Files</a></td>
+                <td><a id="archive-$id-csv-link" class="archive-csv-link" href="">CSV</a></td>
             </tr>
             TABLEROW;
         }

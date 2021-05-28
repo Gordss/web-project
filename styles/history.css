@@ -16,12 +16,13 @@ td {
     border: 1px solid whitesmoke;
     text-align: center;
     padding-bottom: 0.25rem;
+    width: 25%;
 }
 
 table tr:first-child td {
     font-weight: bold;
 }
 
-td a {
+.archive-csv-link {
     color: orange;
 }
