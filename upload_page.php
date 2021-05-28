@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TODO add title</title>
+    <title>Zip to CSV converter</title>
 
     <link rel="stylesheet" href="styles/style.css">
     <script src="scripts/upload_archive.js"></script>
 </head>
 <body>
 <header id="main-header">
-    <a href=""><h1>Zip to ... Converter</h1></a>
+    <a href=""><h1>Zip to CSV Converter</h1></a>
     <h3>Greetings,
         <?php
         session_start();
