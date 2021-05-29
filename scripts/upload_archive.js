@@ -16,6 +16,7 @@ function onColorChange() {
 
 function uploadArchive(event) {
     event.preventDefault();
+    var resultPlaceholder = document.getElementById('csv-result-placeholder');
 
     let zip = getUploadedFile();
     if (!zip) {
@@ -23,6 +24,20 @@ function uploadArchive(event) {
     }
 
     const formData = new FormData(document.querySelector('form'));
+
+    var requestedDelimiter;
+    try {
+        const options = JSON.parse(formData.get('options'));
+        requestedDelimiter = options?.delimiter ? options.delimiter : ',';
+    } catch (e) {
+        requestedDelimiter = ',';
+    }
+    const nameWithoutExtension = zip.name.split('.').slice(0, -1)[0];
+    if (nameWithoutExtension.includes(requestedDelimiter) || nameWithoutExtension.includes('.')) {
+        resultPlaceholder.innerHTML = `The uploaded file's name must not contain ${requestedDelimiter} symbols`;
+        return;
+    }
+
     formData.append('file', zip);
 
     fetch('archive.php', {
@@ -30,7 +45,6 @@ function uploadArchive(event) {
         body: formData
     }).then(response => {
         response.text().then(text => {
-            const resultPlaceholder = document.getElementById('csv-result-placeholder');
             resultPlaceholder.innerHTML = '';
 
             if (response.status !== 200) {

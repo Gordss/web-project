@@ -72,15 +72,15 @@ function parseOptions(): array
         return DEFAULT_OPTIONS;
     }
 
-    for ($i = 0; $i < sizeof($options['included-fields']); $i++) {
-        if (!in_array($options['included-fields'][$i], DEFAULT_OPTIONS['included-fields'])) {
-            array_splice($options['included-fields'],$i,1);
-        }
-    }
-
     foreach (DEFAULT_OPTIONS as $key => $value) {
         if (!array_key_exists($key, $options)) {
             $options[$key] = $value;
+        }
+    }
+
+    for ($i = 0; $i < sizeof($options['included-fields']); $i++) {
+        if (!in_array($options['included-fields'][$i], DEFAULT_OPTIONS['included-fields'])) {
+            array_splice($options['included-fields'],$i,1);
         }
     }
     return $options;
