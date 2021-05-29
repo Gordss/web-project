@@ -44,7 +44,7 @@ class Archive
         foreach ($this->files as $file) {
             $csv .= implode($options['delimiter'], $file->getFields($options['included-fields'])) . PHP_EOL;
         }
-        return $csv;
+        return $options['uppercase'] ? strtoupper($csv) : $csv;
     }
 
     public function getFiles(): array

@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') { // Gets a previously uploaded archiv
 const DEFAULT_OPTIONS = array(
     'included-fields' => array('name', 'parent-name', 'content-length', 'type', 'md5_sum'),
     'include-header' => true,
+    'uppercase' => false,
     'delimiter' => ','
 );
 
