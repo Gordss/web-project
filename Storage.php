@@ -76,7 +76,7 @@ class Storage
             $result = $stmt->fetch();
             return $result && sizeof($result) > 0;
         } catch (PDOException $e) {
-            error_log($e->getMessage(), 3, 'errors.log');
+            Logger::log('Could not verify user credentials: ' . $e->getMessage(),);
             return false;
         }
     }
@@ -89,7 +89,7 @@ class Storage
             $result = $stmt->fetch();
             return $result ? $result['id'] : "";
         } catch (PDOException $e) {
-            error_log($e->getMessage(), 3, 'errors.log');
+            Logger::log("Could not find user with username ${username}: " . $e->getMessage());
             return "";
         }
     }
@@ -101,7 +101,7 @@ class Storage
         try {
             $this->conn = new PDO("mysql:dbname=$db;host=$host", getenv('DB_USER') ?: 'root', getenv('DB_PASS') ?: '');
         } catch (PDOException $e) {
-            error_log($e->getMessage(), 3, 'errors.log');
+            Logger::log('Could not connect to DB: ' . $e->getMessage());
             http_response_code(500);
             die;
         }

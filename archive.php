@@ -21,9 +21,14 @@ const DEFAULT_OPTIONS = array(
     'uppercase' => false,
     'delimiter' => ','
 );
+const MAX_FILE_BYTES_SIZE = 2097152;
 
 if (!isset($_FILES['file'])) {
     respondWithBadRequest('No file uploaded');
+}
+
+if ($_FILES['file']['size'] > MAX_FILE_BYTES_SIZE) {
+    respondWithBadRequest("The size of the uploaded archive must not exceed " . MAX_FILE_BYTES_SIZE . ' bytes.');
 }
 $username = authenticateUser();
 verifyFileType();
@@ -80,7 +85,7 @@ function parseOptions(): array
 
     for ($i = 0; $i < sizeof($options['included-fields']); $i++) {
         if (!in_array($options['included-fields'][$i], DEFAULT_OPTIONS['included-fields'])) {
-            array_splice($options['included-fields'],$i,1);
+            array_splice($options['included-fields'], $i, 1);
         }
     }
     return $options;
@@ -104,6 +109,6 @@ function respondWithInternalServerError($reason)
 {
     http_response_code(500);
     echo 'Internal server error';
-    error_log($reason . '\n', 3, 'errors.log');
+    Logger::log('Responding with 500. Reason: ' . $reason);
     die;
 }

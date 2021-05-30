@@ -1,4 +1,5 @@
 var delimiter = ',', typeIndex = -1;
+const MAX_FILE_SIZE_BYTES = 2097152;
 
 window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('form').addEventListener('submit', uploadArchive);
@@ -23,6 +24,11 @@ function uploadArchive(event) {
         return;
     }
 
+    if (zip.size > MAX_FILE_SIZE_BYTES) {
+        terminateRequest(`The uploaded archive's size must not exceed ${MAX_FILE_SIZE_BYTES} bytes`);
+        return;
+    }
+
     const formData = new FormData(document.querySelector('form'));
 
     var requestedDelimiter;
@@ -34,7 +40,7 @@ function uploadArchive(event) {
     }
     const nameWithoutExtension = zip.name.split('.').slice(0, -1)[0];
     if (nameWithoutExtension.includes(requestedDelimiter) || nameWithoutExtension.includes('.')) {
-        resultPlaceholder.innerHTML = `The uploaded file's name must not contain ${requestedDelimiter} symbols`;
+        terminateRequest(`The uploaded file's name must not contain ${requestedDelimiter} symbols`);
         return;
     }
 
@@ -46,13 +52,12 @@ function uploadArchive(event) {
     }).then(response => {
         response.text().then(text => {
             resultPlaceholder.innerHTML = '';
+            resultPlaceholder.style.color = 'white';
 
             if (response.status !== 200) {
-                resultPlaceholder.innerHTML = text;
-                resultPlaceholder.style.color = 'red';
+                terminateRequest(text);
                 return;
             }
-            resultPlaceholder.style.color = 'white';
 
             const options = JSON.parse(response.headers.get('X-Applied-Options'));
             delimiter = options.delimiter ? options.delimiter : ',';
@@ -105,4 +110,10 @@ function createCsvDownloadLink(csvContent, zipName) {
     document.getElementById("download-link-label").innerText = fileName;
 
     link.style.display = "inline";
+}
+
+function terminateRequest(reason) {
+    var resultPlaceholder = document.getElementById('csv-result-placeholder');
+    resultPlaceholder.style.color = 'red';
+    resultPlaceholder.innerHTML = reason;
 }
