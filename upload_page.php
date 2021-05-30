@@ -39,7 +39,19 @@
                 <label for="file-input">Choose a zip file to upload & convert to CSV:</label>
                 <input id="file-input" type="file" name="file">
                 <fieldset class="options-fieldset">
-                    <legend>Conversion Options</legend>
+                    <legend>
+                        Conversion Options
+                        <span
+                                class="tooltip"
+                                data-title="A JSON string for configuring options for the zip->CSV conversion"
+                                data-delimiter="    &quot;delimiter&quot; (string) - will be used to separate the data on each row."
+                                data-fields="    &quot;included-fields&quot; - (array of strings) - what file properties to include in the result CSV. Possible values are: &quot;name&quot;, &quot;type&quot;, &quot;parent-type&quot;, &quot;content-length&quot;, &quot;md5_sum&quot;."
+                                data-header="    &quot;included-header&quot; (boolean) - whether to include a header line in result CSV"
+                                data-uppercase="    &quot;uppercase&quot; - (boolean) - whether to convert the result CSV to uppercase.">
+                            <img alt="info icon" id="info_icon" src="images/info_btn.png"/>
+                        </span>
+                        <a id="options_info"></a>
+                    </legend>
                     <textarea id="options-input" name="options" cols="40" rows="20"></textarea>
                 </fieldset>
                 <fieldset class="options-fieldset">
