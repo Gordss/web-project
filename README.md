@@ -4,7 +4,7 @@ format containing metadata about the files in the archive.
 
 History of uploaded archives is persisted for every user
 
-## There is an active deployment at [Heroku](https://fast-temple-25429.herokuapp.com/)
+## There is an active deployment at [Heroku](https://zipcsvconv.herokuapp.com/)
 
 # How to start
 4 environment variables need to be set in the php config:
