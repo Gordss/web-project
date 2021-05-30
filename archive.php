@@ -57,10 +57,10 @@ try {
     $archive = $storage->insertArchive($_FILES["file"]["tmp_name"], $_FILES['file']['name'], $username);
 
     $options = parseOptions();
-    echo $archive->toCSV($options);
 
     $appliedOptionsJSON = json_encode($options);
     header("X-Applied-Options: $appliedOptionsJSON");
+    echo $archive->toCSV($options);
 } catch (Exception $e) {
     respondWithInternalServerError($e->getMessage());
 }
