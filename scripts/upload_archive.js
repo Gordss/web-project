@@ -6,6 +6,13 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('input[type=color]').forEach(input => {
         input.addEventListener('input', onColorChange);
     })
+
+    document.querySelector('#options-input').innerHTML = `{
+        "delimiter": ",",
+        "included-fields": ["name","type","parent-name","content-length","md5_sum"],
+        "include-header": true,
+        "uppercase": false
+}`; // Default JSON for the input
 });
 
 
@@ -21,6 +28,7 @@ function uploadArchive(event) {
 
     let zip = getUploadedFile();
     if (!zip) {
+        terminateRequest('A file must be uploaded for conversion');
         return;
     }
 
@@ -36,11 +44,14 @@ function uploadArchive(event) {
         const options = JSON.parse(formData.get('options'));
         requestedDelimiter = options?.delimiter ? options.delimiter : ',';
     } catch (e) {
-        requestedDelimiter = ',';
+        terminateRequest('The options for the conversion must be a valid JSON string');
+        return;
     }
     const nameWithoutExtension = zip.name.split('.').slice(0, -1)[0];
-    if (nameWithoutExtension.includes(requestedDelimiter) || nameWithoutExtension.includes('.')) {
-        terminateRequest(`The uploaded file's name must not contain ${requestedDelimiter} symbols`);
+    if (nameWithoutExtension.includes(requestedDelimiter) || nameWithoutExtension.includes('.')
+        || nameWithoutExtension.includes(',')) {
+        const msgAddition = requestedDelimiter !== ',' ? ` and '${requestedDelimiter}'` : '';
+        terminateRequest(`The uploaded file's name must not contain the following symbols: '.', ',' ${msgAddition}`);
         return;
     }
 
@@ -51,13 +62,13 @@ function uploadArchive(event) {
         body: formData
     }).then(response => {
         response.text().then(text => {
-            resultPlaceholder.innerHTML = '';
-            resultPlaceholder.style.color = 'white';
-
             if (response.status !== 200) {
                 terminateRequest(text);
                 return;
             }
+
+            resultPlaceholder.innerHTML = '';
+            resultPlaceholder.style.color = 'white';
 
             const options = JSON.parse(response.headers.get('X-Applied-Options'));
             delimiter = options.delimiter ? options.delimiter : ',';
@@ -102,9 +113,8 @@ function getUploadedFile() {
 function createCsvDownloadLink(csvContent, zipName) {
     let fileName = zipName.substring(0, zipName.length - 3).concat("csv");
 
-    var encodedUri = encodeURI(csvContent);
-    var link = document.getElementById("download-csv");
-    link.setAttribute("href", 'data:text/csv;charset=utf-8,' + encodedUri);
+    let link = document.getElementById("download-csv");
+    link.setAttribute("href", 'data:text/csv;charset=utf-8,' + encodeURI(csvContent));
     link.setAttribute("download", fileName);
 
     document.getElementById("download-link-label").innerText = fileName;
@@ -113,7 +123,7 @@ function createCsvDownloadLink(csvContent, zipName) {
 }
 
 function terminateRequest(reason) {
-    var resultPlaceholder = document.getElementById('csv-result-placeholder');
+    let resultPlaceholder = document.getElementById('csv-result-placeholder');
     resultPlaceholder.style.color = 'red';
     resultPlaceholder.innerHTML = reason;
 }
