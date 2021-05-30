@@ -64,6 +64,10 @@ a:hover, h1:hover {
     background-color: white;
 }
 
+#csv-result-placeholder span {
+    white-space: nowrap;
+}
+
 #file-input-btn {
     color: orange;
     background-color: white;
