@@ -13,13 +13,13 @@ CREATE TABLE IF NOT EXISTS archives (
 );
 
 CREATE TABLE IF NOT EXISTS nodes (
-    archive_id      INT NOT NULL,
-    name            VARCHAR(128) NOT NULL,
-    parent_name     VARCHAR(256),
-    content_length  INT,
-    type            VARCHAR(64),
-    md5_sum         VARCHAR(32),
-    PRIMARY KEY (name,archive_id),
-    FOREIGN KEY (parent_name)
-        REFERENCES nodes(name)
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  archive_id      INT NOT NULL,
+  name            VARCHAR(2048),
+  parent_name     VARCHAR(2048),
+  content_length  INT,
+  type            VARCHAR(64),
+  md5_sum         VARCHAR(32),
+  FOREIGN KEY (archive_id)
+      REFERENCES archives(id)
 );
