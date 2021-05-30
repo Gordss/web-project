@@ -50,7 +50,7 @@ class Storage
 
     public function getArchiveCSV($archiveID): ?string
     {
-        $sql = 'SELECT name,parent_name,content_length,type,md5_sum FROM nodes WHERE archive_id = ?';
+        $sql = 'SELECT name,parent_name,content_length,type,md5_sum FROM nodes WHERE archive_id = ? ORDER BY name';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$archiveID]);
         $nodes = $stmt->fetchAll(PDO::FETCH_ASSOC);
