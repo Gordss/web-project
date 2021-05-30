@@ -7,6 +7,7 @@ table caption {
 table {
     width: 90%;
     margin-top: 1rem;
+    margin-left: 5%;
     border-collapse: collapse;
 }
 

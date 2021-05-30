@@ -33,48 +33,43 @@
     </nav>
 </header>
 <main>
-    <table>
-        <tr>
-            <td>
-                <section>
-                    <form enctype="multipart/form-data">
-                        <label for="file-input">Choose a zip file to upload & convert to CSV:</label>
-                        <input id="file-input" type="file" name="file">
-                        <fieldset class="options-fieldset">
-                            <legend>Conversion Options</legend>
-                            <textarea id="options-input" name="options" cols="40" rows="20"></textarea>
-                        </fieldset>
-                        <fieldset class="options-fieldset">
-                            <legend>Visualization options</legend>
-                            <label>
-                                Text files
-                                <input id="txt-files-color" type="color"/>
-                            </label>
-                            <label>
-                                Image files
-                                <input id="img-files-color" type="color"/>
-                            </label>
-                            <label>
-                                Directories
-                                <input id="dir-files-color" type="color"/>
-                            </label>
-                            <label>
-                                Default
-                                <input id="default-color" type="color"/>
-                            </label>
-                        </fieldset>
-                        <button id="file-input-btn" type="submit">Convert</button>
-                    </form>
-                </section>
-
-            </td>
-            <td>
-                <h3 id="download-label">Converted CSV file:</h3>
-                <a id="download-csv"><h3 id="download-link-label"></h3></a>
-                <p id="csv-result-placeholder"></p>
-            </td>
-        </tr>
-    </table>
+    <section id="upload-section">
+        <section id="upload-input-subsection">
+            <form enctype="multipart/form-data">
+                <label for="file-input">Choose a zip file to upload & convert to CSV:</label>
+                <input id="file-input" type="file" name="file">
+                <fieldset class="options-fieldset">
+                    <legend>Conversion Options</legend>
+                    <textarea id="options-input" name="options" cols="40" rows="20"></textarea>
+                </fieldset>
+                <fieldset class="options-fieldset">
+                    <legend>Visualization options</legend>
+                    <label>
+                        Text files
+                        <input id="txt-files-color" type="color"/>
+                    </label>
+                    <label>
+                        Image files
+                        <input id="img-files-color" type="color"/>
+                    </label>
+                    <label>
+                        Directories
+                        <input id="dir-files-color" type="color"/>
+                    </label>
+                    <label>
+                        Default
+                        <input id="default-color" type="color"/>
+                    </label>
+                </fieldset>
+                <button id="file-input-btn" type="submit">Convert</button>
+            </form>
+        </section>
+        <section id="upload-output-subsection">
+            <h3 id="download-label">Converted CSV file:</h3>
+            <a id="download-csv"><h3 id="download-link-label"></h3></a>
+            <p id="csv-result-placeholder"></p>
+        </section>
+    </section>
 </main>
 </body>
 </html>
