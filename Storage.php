@@ -36,7 +36,13 @@ class Storage
 
     public function fetchArchivesForUser($username): array
     {
-        $stmt = $this->conn->prepare('SELECT * FROM archives WHERE user_id = ?');
+        $sql = <<<SQL
+        SELECT a.id, a.uploaded_at, n.md5_sum, n.name FROM archives a
+            JOIN nodes n on n.archive_id=a.id AND ISNULL(n.parent_name)
+        WHERE user_id = ?;
+        SQL;
+
+        $stmt = $this->conn->prepare($sql);
         $stmt->execute([$this->getUserIDByName($username)]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

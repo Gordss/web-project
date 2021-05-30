@@ -39,8 +39,10 @@
         <caption>Uploaded archives</caption>
         <tr>
             <td>Archive ID</td>
+            <td>Archive Name</td>
+            <td>MD5 sum</td>
             <td>Uploaded at</td>
-            <td>Download</td>
+            <td colspan=2>Actions</td>
         </tr>
         <?php
         require "Storage.php";
@@ -48,11 +50,16 @@
         foreach ($archives as $archive) {
             $id = $archive['id'];
             $time = $archive['uploaded_at'];
+            $name = $archive['name'];
+            $md5_sum = $archive['md5_sum'];
             echo <<<TABLEROW
             <tr>
                 <td>$id</td>
+                <td>$name</td>
+                <td>$md5_sum</td>
                 <td>$time</td>
-                <td><a id="archive-$id-csv-link" class="archive-csv-link" href="">CSV</a></td>
+                <td class="actions-td"><a id="archive-$id-csv-link" class="archive-csv-link" href="">Download</a></td>
+                <td class="actions-td"><a id="archive-$id-delete-link" class="archive-delete-link" href="">Delete</a></td>
             </tr>
             TABLEROW;
         }

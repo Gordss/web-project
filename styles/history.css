@@ -16,7 +16,11 @@ td {
     border: 1px solid whitesmoke;
     text-align: center;
     padding-bottom: 0.25rem;
-    width: 25%;
+    width: 20%;
+}
+
+.actions-td {
+    width: 10%;
 }
 
 table tr:first-child td {
@@ -25,4 +29,8 @@ table tr:first-child td {
 
 .archive-csv-link {
     color: orange;
+}
+
+.archive-delete-link {
+    color: red;
 }
