@@ -13,6 +13,7 @@ History of uploaded archives is persisted for every user
 * `DB_USER` - the database user's name (default='root')
 * `DB_PASS` - the database user's password (default='')
 
+Also, a database with name `DB_NAME` has to exist.
 If local XAMPP setup is used, the only precondition is to create a database called
 `web_project`. The default root user without password will be used.
 

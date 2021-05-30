@@ -22,4 +22,5 @@ CREATE TABLE IF NOT EXISTS nodes (
   md5_sum         VARCHAR(32),
   FOREIGN KEY (archive_id)
       REFERENCES archives(id)
+        ON DELETE CASCADE
 );

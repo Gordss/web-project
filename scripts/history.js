@@ -18,4 +18,20 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    document.querySelectorAll('.archive-delete-link').forEach(link => {
+        const archiveID = link.id.split('-')[1];
+        link.addEventListener('click', event => {
+            event.preventDefault();
+
+            fetch(`archive.php?id=${archiveID}`, {
+                method: 'DELETE'
+            }).then(response => {
+                if (response.status === 204) {
+                    let archiveTableEntry = link.parentElement.parentElement;
+                    archiveTableEntry.parentElement.removeChild(archiveTableEntry);
+                }
+            });
+        })
+    });
 });

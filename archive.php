@@ -2,6 +2,8 @@
 
 require "Storage.php";
 
+$username = authenticateUser();
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') { // Gets a previously uploaded archive's CSV representation
     if (!isset($_GET['id'])) {
         respondWithBadRequest('Missing ID query parameter');
@@ -14,6 +16,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') { // Gets a previously uploaded archiv
     echo $archiveCSV;
     die;
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE') { // Deletes an archive from the DB
+    $parsedQueryString = '';
+    parse_str($_SERVER['QUERY_STRING'], $parsedQueryString);
+    if (!array_key_exists('id', $parsedQueryString) || empty($parsedQueryString['id'])) {
+        respondWithBadRequest('Missing ID query parameter');
+    }
+    $id = $parsedQueryString['id'];
+
+    $success = Storage::getInstance()->deleteArchive($id);
+    if (!$success) {
+        respondWithNotFound("Archive with ID $id not found");
+    }
+    http_response_code(204);
+    die;
+}
+
+// Otherwise, upload an archive and return its CSV representation
 
 const DEFAULT_OPTIONS = array(
     'included-fields' => array('name', 'parent-name', 'content-length', 'type', 'md5_sum'),
@@ -30,7 +50,7 @@ if (!isset($_FILES['file'])) {
 if ($_FILES['file']['size'] > MAX_FILE_BYTES_SIZE) {
     respondWithBadRequest("The size of the uploaded archive must not exceed " . MAX_FILE_BYTES_SIZE . ' bytes.');
 }
-$username = authenticateUser();
+
 verifyFileType();
 try {
     $storage = Storage::getInstance();
@@ -60,7 +80,6 @@ function authenticateUser()
 {
     session_start();
     if (!isset($_SESSION['username'])) {
-        http_response_code(401);
         header('Location: login.php');
         die;
     }

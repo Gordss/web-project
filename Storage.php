@@ -1,6 +1,7 @@
 <?php
 
 require "model/Archive.php";
+require "Logger.php";
 
 const DIRECTORY_TYPE = "directory";
 class Storage
@@ -47,7 +48,7 @@ class Storage
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getArchiveCSV($archiveID)
+    public function getArchiveCSV($archiveID): ?string
     {
         $sql = 'SELECT name,parent_name,content_length,type,md5_sum FROM nodes WHERE archive_id = ?';
         $stmt = $this->conn->prepare($sql);
@@ -61,6 +62,13 @@ class Storage
             $csv .= implode(',', $node) . PHP_EOL;
         }
         return $csv;
+    }
+
+    public function deleteArchive($id): bool
+    {
+        $sql = 'DELETE FROM archives WHERE id = ?';
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute([$id]);
     }
 
     public function registerUser($username, $password): string
