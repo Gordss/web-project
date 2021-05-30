@@ -47,7 +47,7 @@ function uploadArchive(event) {
         terminateRequest('The options for the conversion must be a valid JSON string');
         return;
     }
-    const nameWithoutExtension = zip.name.split('.').slice(0, -1)[0];
+    const nameWithoutExtension = zip.name.split('.').slice(0, -1).join('');
     if (nameWithoutExtension.includes(requestedDelimiter) || nameWithoutExtension.includes('.')
         || nameWithoutExtension.includes(',')) {
         const msgAddition = requestedDelimiter !== ',' ? ` and '${requestedDelimiter}'` : '';
