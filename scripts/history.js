@@ -7,7 +7,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     var lines = text.split('\n');
                     lines.pop(); // There is an extra line in the end
 
-                    const filename = lines[1].split(/[,.]/).slice(0, -1).join() + '.csv';
+                    const filename = lines[1].split(',')[0].split('.').slice(0, -1).join() + '.csv';
                     link.setAttribute('href', 'data:text/csv;charset=utf-8' + encodeURI(text));
                     link.setAttribute('download', filename);
 
