@@ -1,6 +1,7 @@
 <?php
 
 require "Storage.php";
+require "IdsGenerator.php";
 
 $username = authenticateUser();
 
@@ -36,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') { // Deletes an archive from the DB
 // Otherwise, upload an archive and return its CSV representation
 
 const DEFAULT_OPTIONS = array(
-    'included-fields' => array('name', 'parent-name', 'content-length', 'type', 'md5_sum'),
+    'included-fields' => array('id', 'parent_id','name', 'parent-name', 'content-length', 'type', 'md5_sum','is_leaf'),
     'include-header' => true,
     'uppercase' => false,
     'delimiter' => ','
@@ -57,10 +58,18 @@ try {
     $archive = $storage->insertArchive($_FILES["file"]["tmp_name"], $_FILES['file']['name'], $username);
 
     $options = parseOptions();
+    verifyOptions($options);
 
     $appliedOptionsJSON = json_encode($options);
     header("X-Applied-Options: $appliedOptionsJSON");
-    echo $archive->toCSV($options);
+    $csv = $archive->toCSV($options);
+    if (shouldGenerateIds($options)) {
+        $indexed_csv = new IdsGenerator($csv);
+        echo $indexed_csv->getIndexedCsvData($options);
+    } else {
+        echo $csv;
+    }
+
 } catch (Exception $e) {
     respondWithInternalServerError($e->getMessage());
 }
@@ -74,6 +83,15 @@ function verifyFileType()
         }
     }
     respondWithBadRequest('The uploaded file is not a zip archive');
+}
+
+//you cannot choose to include parent_id field without inclusing is field
+function verifyOptions($options)
+{
+    $includedFields = $options['included-fields'];
+    if (!in_array('id', $includedFields) && in_array('parent_id', $includedFields)) {
+        respondWithBadRequest('Chosen conversion options are invalid. Field "parent_id" can only be included if field "id" is included.');
+    }
 }
 
 function authenticateUser()
@@ -108,6 +126,11 @@ function parseOptions(): array
         }
     }
     return $options;
+}
+
+function shouldGenerateIds($options) : bool {
+    $includedFields = $options['included-fields'];
+    return in_array('id', $includedFields) || in_array('parent_id', $includedFields) || in_array('is_leaf', $includedFields);
 }
 
 function respondWithBadRequest($reason)

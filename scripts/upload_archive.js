@@ -9,7 +9,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     document.querySelector('#options-input').innerHTML = `{
         "delimiter": ",",
-        "included-fields": ["name","type","parent-name","content-length","md5_sum"],
+        "included-fields": ["id","parent_id","name","type","parent-name","content-length","md5_sum","is_leaf"],
         "include-header": true,
         "uppercase": false
 }`; // Default JSON for the input
@@ -67,13 +67,18 @@ function uploadArchive(event) {
                 return;
             }
 
+            console.log(text);
             resultPlaceholder.innerHTML = '';
             resultPlaceholder.style.color = 'white';
 
             const options = JSON.parse(response.headers.get('X-Applied-Options'));
             delimiter = options.delimiter ? options.delimiter : ',';
             typeIndex = options['included-fields'] ? options['included-fields'].indexOf('type') : -1;
+            if (options['index-files'] != undefined && options['index-files'] == true) {
+                typeIndex += 2;
+            }
 
+            console.log(typeIndex);
             const lines = text.split("\n");
             lines.pop(); // There is an empty line in the end
             lines.forEach(line => {
@@ -111,6 +116,7 @@ function getUploadedFile() {
 }
 
 function createCsvDownloadLink(csvContent, zipName) {
+    
     let fileName = zipName.substring(0, zipName.length - 3).concat("csv");
 
     let link = document.getElementById("download-csv");
