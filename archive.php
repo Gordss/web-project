@@ -1,7 +1,6 @@
 <?php
 
 require "Storage.php";
-require "IdsGenerator.php";
 
 $username = authenticateUser();
 
@@ -63,12 +62,8 @@ try {
     $appliedOptionsJSON = json_encode($options);
     header("X-Applied-Options: $appliedOptionsJSON");
     $csv = $archive->toCSV($options);
-    if (shouldGenerateIds($options)) {
-        $indexed_csv = new IdsGenerator($csv);
-        echo $indexed_csv->getIndexedCsvData($options);
-    } else {
-        echo $csv;
-    }
+    echo $csv;
+
 
 } catch (Exception $e) {
     respondWithInternalServerError($e->getMessage());
@@ -126,11 +121,6 @@ function parseOptions(): array
         }
     }
     return $options;
-}
-
-function shouldGenerateIds($options) : bool {
-    $includedFields = $options['included-fields'];
-    return in_array('id', $includedFields) || in_array('parent_id', $includedFields) || in_array('is_leaf', $includedFields);
 }
 
 function respondWithBadRequest($reason)

@@ -23,7 +23,10 @@ function onColorChange() {
 }
 
 function uploadArchive(event) {
+
     event.preventDefault();
+    document.getElementById("download-csv").style.display = 'none';
+    
     var resultPlaceholder = document.getElementById('csv-result-placeholder');
 
     let zip = getUploadedFile();
