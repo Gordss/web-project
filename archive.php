@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') { // Deletes an archive from the DB
 // Otherwise, upload an archive and return its CSV representation
 
 const DEFAULT_OPTIONS = array(
-    'included-fields' => array('name', 'parent-name', 'content-length', 'type', 'md5_sum'),
+    'included-fields' => array('id', 'parent_id','name', 'parent-name', 'content-length', 'type', 'md5_sum','is_leaf'),
     'include-header' => true,
     'uppercase' => false,
     'delimiter' => ','
@@ -107,6 +107,13 @@ function parseOptions(): array
             array_splice($options['included-fields'], $i, 1);
         }
     }
+
+    //you cannot choose to include parent_id field without including is field
+    $includedFields = $options['included-fields'];
+    if (!in_array('id', $includedFields) && in_array('parent_id', $includedFields)) {
+        respondWithBadRequest('Chosen conversion options are invalid. Field "parent_id" can only be included if field "id" is included.');
+    }
+
     return $options;
 }
 

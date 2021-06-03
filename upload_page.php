@@ -45,7 +45,7 @@
                                 class="tooltip"
                                 data-title="A JSON string for configuring options for the zip->CSV conversion"
                                 data-delimiter="    &quot;delimiter&quot; (string) - will be used to separate the data on each row."
-                                data-fields="    &quot;included-fields&quot; - (array of strings) - what file properties to include in the result CSV. Possible values are: &quot;name&quot;, &quot;type&quot;, &quot;parent-type&quot;, &quot;content-length&quot;, &quot;md5_sum&quot;."
+                                data-fields="    &quot;included-fields&quot; - (array of strings) - what file properties to include in the result CSV. Possible values are: &quot;id&quot;, &quot;parent_id&quot;, &quot;name&quot;, &quot;type&quot;, &quot;parent-type&quot;, &quot;content-length&quot;, &quot;md5_sum&quot;, &quot;is_leaf&quot;."
                                 data-header="    &quot;included-header&quot; (boolean) - whether to include a header line in result CSV"
                                 data-uppercase="    &quot;uppercase&quot; - (boolean) - whether to convert the result CSV to uppercase.">
                             <img alt="info icon" id="info_icon" src="images/info_btn.png"/>

@@ -9,7 +9,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     document.querySelector('#options-input').innerHTML = `{
         "delimiter": ",",
-        "included-fields": ["name","type","parent-name","content-length","md5_sum"],
+        "included-fields": ["id","parent_id","name","type","parent-name","content-length","md5_sum","is_leaf"],
         "include-header": true,
         "uppercase": false
 }`; // Default JSON for the input
@@ -23,7 +23,10 @@ function onColorChange() {
 }
 
 function uploadArchive(event) {
+
     event.preventDefault();
+    document.getElementById("download-csv").style.display = 'none';
+
     var resultPlaceholder = document.getElementById('csv-result-placeholder');
 
     let zip = getUploadedFile();
@@ -67,6 +70,7 @@ function uploadArchive(event) {
                 return;
             }
 
+            console.log(text);
             resultPlaceholder.innerHTML = '';
             resultPlaceholder.style.color = 'white';
 
@@ -111,6 +115,7 @@ function getUploadedFile() {
 }
 
 function createCsvDownloadLink(csvContent, zipName) {
+    
     let fileName = zipName.substring(0, zipName.length - 3).concat("csv");
 
     let link = document.getElementById("download-csv");
