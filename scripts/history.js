@@ -10,7 +10,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     let filename = lines[1].split(',')[0];
                     filename = filename.substring(0, filename.length - 3).concat('csv');
                     link.setAttribute('download', filename);
-                    link.setAttribute('href', 'data:text/csv;charset=utf-8' + encodeURI(text));
+                    link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURI(text));
                 });
             } else {
                 link.removeAttribute('href');
