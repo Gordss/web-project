@@ -67,7 +67,6 @@ class Archive
             $i++;
         }
 
-
         $fileNameToId[''] = NULL;
 
         foreach ($this->files as $file) {

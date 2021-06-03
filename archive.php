@@ -57,14 +57,10 @@ try {
     $archive = $storage->insertArchive($_FILES["file"]["tmp_name"], $_FILES['file']['name'], $username);
 
     $options = parseOptions();
-    verifyOptions($options);
 
     $appliedOptionsJSON = json_encode($options);
     header("X-Applied-Options: $appliedOptionsJSON");
-    $csv = $archive->toCSV($options);
-    echo $csv;
-
-
+    echo $archive->toCSV($options);
 } catch (Exception $e) {
     respondWithInternalServerError($e->getMessage());
 }
@@ -78,15 +74,6 @@ function verifyFileType()
         }
     }
     respondWithBadRequest('The uploaded file is not a zip archive');
-}
-
-//you cannot choose to include parent_id field without inclusing is field
-function verifyOptions($options)
-{
-    $includedFields = $options['included-fields'];
-    if (!in_array('id', $includedFields) && in_array('parent_id', $includedFields)) {
-        respondWithBadRequest('Chosen conversion options are invalid. Field "parent_id" can only be included if field "id" is included.');
-    }
 }
 
 function authenticateUser()
@@ -120,6 +107,13 @@ function parseOptions(): array
             array_splice($options['included-fields'], $i, 1);
         }
     }
+
+    //you cannot choose to include parent_id field without including is field
+    $includedFields = $options['included-fields'];
+    if (!in_array('id', $includedFields) && in_array('parent_id', $includedFields)) {
+        respondWithBadRequest('Chosen conversion options are invalid. Field "parent_id" can only be included if field "id" is included.');
+    }
+
     return $options;
 }
 
