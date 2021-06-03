@@ -26,7 +26,7 @@ function uploadArchive(event) {
 
     event.preventDefault();
     document.getElementById("download-csv").style.display = 'none';
-    
+
     var resultPlaceholder = document.getElementById('csv-result-placeholder');
 
     let zip = getUploadedFile();
@@ -77,11 +77,7 @@ function uploadArchive(event) {
             const options = JSON.parse(response.headers.get('X-Applied-Options'));
             delimiter = options.delimiter ? options.delimiter : ',';
             typeIndex = options['included-fields'] ? options['included-fields'].indexOf('type') : -1;
-            if (options['index-files'] != undefined && options['index-files'] == true) {
-                typeIndex += 2;
-            }
 
-            console.log(typeIndex);
             const lines = text.split("\n");
             lines.pop(); // There is an empty line in the end
             lines.forEach(line => {
