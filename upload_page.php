@@ -52,7 +52,7 @@
                         </span>
                         <a id="options_info"></a>
                     </legend>
-                    <textarea id="options-input" name="options" cols="40" rows="20"></textarea>
+                    <textarea id="options-input" name="options" cols="40" rows="10"></textarea>
                 </fieldset>
                 <fieldset class="options-fieldset">
                     <legend>Visualization options</legend>
