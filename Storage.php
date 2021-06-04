@@ -18,10 +18,10 @@ class Storage
         return self::$_instance;
     }
 
-    public function insertArchive($path, $archiveName, $username)
+    public function insertArchive($path, $archiveName, $username, $options)
     {
-        $stmt = $this->conn->prepare('INSERT INTO archives (user_id) VALUES(?)');
-        $stmt->execute([$this->getUserIDByName($username)]);
+        $stmt = $this->conn->prepare('INSERT INTO archives (user_id, options_json) VALUES(?, ?)');
+        $stmt->execute([$this->getUserIDByName($username), json_encode($options)]);
         $archiveID = $this->conn->lastInsertId();
 
         $archive = new Archive($archiveName, $path);
@@ -53,15 +53,20 @@ class Storage
         $sql = 'SELECT name,parent_name,content_length,type,md5_sum FROM nodes WHERE archive_id = ? ORDER BY name';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$archiveID]);
-        $nodes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $nodes = $stmt->fetchAll();
         if (sizeof($nodes) == 0) {
             return null;
         }
-        $csv = 'name,parent-name,content-length,type,md5_sum' . PHP_EOL;
+
+        $files = array();
         foreach ($nodes as $node) {
-            $csv .= implode(',', $node) . PHP_EOL;
+            array_push($files, new File($node['name'], $node['parent_name'], $node['content_length'], $node['type'], $node['md5_sum']));
         }
-        return $csv;
+
+        $stmt = $this->conn->prepare('SELECT options_json FROM archives WHERE id = ?');
+        $stmt->execute([$archiveID]);
+
+        return Archive::fileListToCSV($files, json_decode($stmt->fetch()['options_json'], true));
     }
 
     public function deleteArchive($id): bool

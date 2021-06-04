@@ -31,55 +31,62 @@ class Archive
 
             $name = "$dir/$baseName";
             $contentLength = strlen($fileContent);
-            $type = $filePath['extension'] ?? DIRECTORY_TYPE ;
+            $type = $filePath['extension'] ?? DIRECTORY_TYPE;
             $md5Sum = md5($fileContent);
 
             $file = new File($name, $dir, $contentLength, $type, $md5Sum);
             array_push($this->files, $file);
         }
-        usort($this->files, "Archive::cmpFiles");
-        $this->setFileIds();
     }
 
     public function toCSV($options): string
     {
+        return self::fileListToCSV($this->files, $options);
+    }
+
+    public static function fileListToCSV($files, $options): string
+    {
+        usort($files, "Archive::cmpFiles");
+        if (self::shouldGenerateIds($options)) {
+            self::setFileIds($files);
+        }
+
         $csv = '';
         if ($options['include-header']) {
             $csv = implode($options['delimiter'], $options['included-fields']) . PHP_EOL;
         }
 
-        foreach ($this->files as $file) {
-
+        foreach ($files as $file) {
             $csv .= implode($options['delimiter'], $file->getFields($options['included-fields'])) . PHP_EOL;
         }
 
         return $options['uppercase'] ? strtoupper($csv) : $csv;
     }
 
-    private function setFileIds() {
+    private static function setFileIds($files)
+    {
         $i = 0;
         $fileNameToId = array();
         $fileNameToChildren = array();
-        foreach ($this->files as $file) {
-            $file->setId($i);
-            $fileNameToId[$file->getName()] = $i;
-            $fileNameToChildren[$file->getParentName()] = true;
+        foreach ($files as $file) {
+            $file->id = $i;
+            $fileNameToId[$file->name] = $i;
+            $fileNameToChildren[$file->parent_name] = true;
             $i++;
         }
 
         $fileNameToId[''] = NULL;
 
-        foreach ($this->files as $file) {
-            $parent_id = $fileNameToId[$file->getParentName()];
+        foreach ($files as $file) {
+            $parent_id = $fileNameToId[$file->parent_name];
             $is_leaf = true;
 
-            if (array_key_exists($file->getName(), $fileNameToChildren)) {
+            if (array_key_exists($file->name, $fileNameToChildren)) {
                 $is_leaf = false;
             }
 
-            $file->setParentId($parent_id);
-            $file->setIsLeaf($is_leaf);
-
+            $file->parent_id = $parent_id;
+            $file->is_leaf = $is_leaf;
         }
     }
 
@@ -90,10 +97,11 @@ class Archive
 
     private static function cmpFiles($file1, $file2)
     {
-        return strcmp(strlen($file1->getName()), strlen($file2->getName()));
+        return strcmp($file1->name, $file2->name);
     }
-    
-    function shouldGenerateIds($options) : bool {
+
+    private static function shouldGenerateIds($options): bool
+    {
         $includedFields = $options['included-fields'];
         return in_array('id', $includedFields) || in_array('parent_id', $includedFields) || in_array('is_leaf', $includedFields);
     }

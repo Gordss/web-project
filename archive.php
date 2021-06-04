@@ -54,9 +54,8 @@ if ($_FILES['file']['size'] > MAX_FILE_BYTES_SIZE) {
 verifyFileType();
 try {
     $storage = Storage::getInstance();
-    $archive = $storage->insertArchive($_FILES["file"]["tmp_name"], $_FILES['file']['name'], $username);
-
     $options = parseOptions();
+    $archive = $storage->insertArchive($_FILES["file"]["tmp_name"], $_FILES['file']['name'], $username, $options);
 
     $appliedOptionsJSON = json_encode($options);
     header("X-Applied-Options: $appliedOptionsJSON");

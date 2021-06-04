@@ -2,14 +2,14 @@
 
 class File
 {
-    private $id;
-    private $parent_id;
-    private $name;
-    private $parent_name;
-    private $content_length;
-    private $type;
-    private $md5_sum;
-    private $is_leaf;
+    public $id;
+    public $parent_id;
+    public $name;
+    public $parent_name;
+    public $content_length;
+    public $type;
+    public $md5_sum;
+    public $is_leaf;
 
     public function __construct($name, $parent_name, $content_length, $type, $md5_sum)
     {
@@ -20,7 +20,7 @@ class File
         $this->md5_sum = $md5_sum;
     }
 
-    public function getFields($includedFields = array('name','parent-name','content-length','type','md5_sum')): array
+    public function getFields($includedFields = array('name', 'parent-name', 'content-length', 'type', 'md5_sum')): array
     {
         $fields = array();
         foreach ($includedFields as $fieldName) {
@@ -48,51 +48,11 @@ class File
                     break;
                 case 'is_leaf':
                     array_push($fields, $this->is_leaf ? 'true' : 'false');
-                    break;  
+                    break;
                 default:
             }
         }
         return $fields;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function getParentName()
-    {
-        return $this->parent_name;
-    }
-
-    public function getContentLength()
-    {
-        return $this->content_length;
-    }
-
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    public function getMD5Sum()
-    {
-        return $this->md5_sum;
-    }
-
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    public function setParentId($id)
-    {
-        $this->parent_id = $id;
-    }
-
-    public function setIsLeaf($is_leaf)
-    {
-        $this->is_leaf = $is_leaf;
     }
 
 }
