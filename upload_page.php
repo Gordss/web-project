@@ -77,8 +77,11 @@
             </form>
         </section>
         <section id="upload-output-subsection">
-            <h3 id="download-label">Converted CSV file:</h3>
-            <a id="download-csv"><h3 id="download-link-label"></h3></a>
+                <h3 id="download-label">Converted CSV file:</h3>
+            <section id="download-links-section">
+                <a id="download-csv"><h3 id="download-link-label"></h3></a>
+                <a id="download-html" onclick="updateDownloadHTMLLink()"><h3 id="html-download-link-label"></h3></a>
+            </section>
             <p id="csv-result-placeholder"></p>
         </section>
     </section>
