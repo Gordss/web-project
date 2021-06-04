@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS archives (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   uploaded_at DATETIME NOT NULL DEFAULT current_timestamp,
+  options_json VARCHAR(1024) NOT NULL,
   FOREIGN KEY (user_id)
     REFERENCES users(id)
 );
