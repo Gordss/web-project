@@ -88,6 +88,7 @@ function uploadArchive(event) {
                 resultPlaceholder.appendChild(document.createElement('br'));
             })
             createCsvDownloadLink(text, zip['name']);
+            updateDownloadHTMLLink();
         });
     })
 }
@@ -115,17 +116,27 @@ function getUploadedFile() {
 }
 
 function createCsvDownloadLink(csvContent, zipName) {
-    
-    let fileName = zipName.substring(0, zipName.length - 3).concat("csv");
+    const fileName = zipName.substring(0, zipName.length - 3).concat("csv");
+    document.getElementById("download-link-label").innerText = fileName;
 
     let link = document.getElementById("download-csv");
     link.setAttribute("href", 'data:text/csv;charset=utf-8,' + encodeURI(csvContent));
     link.setAttribute("download", fileName);
-
-    document.getElementById("download-link-label").innerText = fileName;
-
     link.style.display = "inline";
 }
+
+function updateDownloadHTMLLink() {
+    const zipName = document.getElementById('download-csv').innerText;
+    const fileName = zipName.substring(0, zipName.length - 3).concat('html');
+    document.getElementById('html-download-link-label').innerText = fileName;
+
+    let link = document.getElementById('download-html');
+    const htmlContent = document.getElementById('csv-result-placeholder').innerHTML;
+    link.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURI(htmlContent));
+    link.setAttribute('download', fileName);
+    link.style.display = 'inline';
+}
+
 
 function terminateRequest(reason) {
     let resultPlaceholder = document.getElementById('csv-result-placeholder');

@@ -85,18 +85,16 @@ a:hover, h1:hover {
     font-family: sans-serif;
 }
 
-#download-csv {
-    display: none;
-    float: right;
-    text-align: right;
-}
-
-#download-label {
+#upload-output-subsection h3 {
     display: inline;
-    float: left;
 }
 
-#download-link-label:hover {
+#download-links-section {
+    display: inline-flex;
+    justify-content: space-evenly;
+}
+
+#download-link-label:hover, #html-download-link-label:hover {
     color: #f76725;
 }
 
