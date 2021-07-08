@@ -64,6 +64,22 @@ class Archive
             if (array_key_exists('skip-zip-filename', $options)) {
                 $file->setSkipZipFilename($options['skip-zip-filename']);
             }
+
+            if (array_key_exists('css-directory', $options)) {
+                $file->setCssDirectory($options['css-directory']);
+            }
+
+            if (array_key_exists('css-text-file', $options)) {
+                $file->setCssTextFile($options['css-text-file']);
+            }
+
+            if (array_key_exists('css-image-file', $options)) {
+                $file->setCssImageFile($options['css-image-file']);
+            }
+
+            if (array_key_exists('css-default', $options)) {
+                $file->setCssDefault($options['css-default']);
+            }
             $file_string = implode($options['delimiter'], $file->getFields($options['included-fields'])) . PHP_EOL;
             $csv .= $file_string;
         }

@@ -13,6 +13,10 @@ class File
 
     private $isLeafNumeric = false;
     private $skipZipFilename = false;
+    private $cssDirectory = null;
+    private $cssTextFile = null;
+    private $cssImageFile = null;
+    private $cssDefault = null;
     public function __construct($name, $parent_name, $content_length, $type, $md5_sum)
     {
         $this->name = $name;
@@ -28,6 +32,22 @@ class File
 
     public function setSkipZipFilename($value) {
         $this->skipZipFilename = $value;
+    }
+
+    public function setCssDirectory($value) {
+        $this->cssDirectory = $value;
+    }
+
+    public function setCssTextFile($value) {
+        $this->cssTextFile = $value;
+    }
+
+    public function setCssImageFile($value) {
+        $this->cssImageFile = $value;
+    }
+
+    public function setCssDefault($value) {
+        $this->cssDefault = $value;
     }
 
     public function getFields($includedFields = array('name', 'parent-name', 'content-length', 'type', 'md5_sum')): array
@@ -59,6 +79,9 @@ class File
                 case 'is_leaf':
                     array_push($fields, self::constructIsLeafValue($this->isLeafNumeric));
                     break;
+                case 'css':
+                    array_push($fields, self::constructCssValue());
+                    break;
                 default:
             }
         }
@@ -85,6 +108,20 @@ class File
             }
         }
         return $nameValue;
+    }
+
+    private function constructCssValue() {
+        if (in_array($this->type, array('txt', 'md', 'doc', 'docx'))) {
+            return $this->cssTextFile;
+        }
+        if (in_array($this->type, array('jpg', 'png', 'gif'))) {
+            return $this->cssImageFile;
+        }
+        if ('directory' === $this->type) {
+            return $this->cssDirectory;
+        }
+
+        return $this->cssDefault;
     }
 
 }

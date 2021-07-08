@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') { // Deletes an archive from the DB
 // Otherwise, upload an archive and return its CSV representation
 
 const DEFAULT_OPTIONS = array(
-    'included-fields' => array('id', 'parent_id','name', 'parent-name', 'content-length', 'type', 'md5_sum','is_leaf'),
+    'included-fields' => array('id', 'parent_id','name', 'parent-name', 'content-length', 'type', 'md5_sum','is_leaf', 'css'),
     'include-header' => true,
     'uppercase' => false,
     'delimiter' => ',',
@@ -119,10 +119,32 @@ function parseOptions(): array
         respondWithBadRequest('Chosen conversion options are invalid. Field "parent_id" can only be included if field "id" is included.');
     }
 
-    //you cannot choose to include parent_id field without including is field
-    $includedFields = $options['included-fields'];
-    if (!in_array('is_leaf', $includedFields) && array_key_exists('is-leaf-numeric', $options)) {
-        respondWithBadRequest('Chosen conversion options are invalid. Option "is-leaf-numeric" can only be specified if field "is_leaf" is included.');
+    //verify css values do not contain chosen delimiter
+    if (in_array('css', $includedFields) && array_key_exists('is-leaf-numeric', $options)) {
+        $valid = true;
+        if (array_key_exists('css-directory', $options)) {
+            if (strpos($options['css-directory'], $options['delimiter']) != false) {
+                $valid = false;
+            }
+        }
+        if (array_key_exists('css-text-file', $options)) {
+            if (strpos($options['css-text-file'], $options['delimiter']) != false) {
+                $valid = false;
+            }
+        }
+        if (array_key_exists('css-image-file', $options)) {
+            if (strpos($options['css-image-file'], $options['delimiter']) != false) {
+                $valid = false;
+            }
+        }
+        if (array_key_exists('css-default', $options)) {
+            if (strpos($options['css-default'], $options['delimiter']) != false) {
+                $valid = false;
+            }
+        }
+        if (!$valid) {
+            respondWithBadRequest('Chosen conversion options are invalid. CSS values cannot contain the chosen delimiter.');
+        }
     }
 
     return $options;
