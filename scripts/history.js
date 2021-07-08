@@ -20,6 +20,27 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    document.querySelectorAll('.archive-options-link').forEach(link => {
+        const archiveID = link.id.split('-')[1];
+        fetch(`archive.php?id=${archiveID}&options=true`).then(response => {
+            if (response.status === 200) {
+                response.text().then(text => {
+
+                    const archiveName = link.parentElement.parentElement.children[1].innerHTML;
+                    const filename = archiveName.substring(0, archiveName.length - 3).concat('json');
+                    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(text);
+
+                    link.setAttribute("href", dataStr);
+                    link.setAttribute("download", filename);
+                });
+            } else {
+                link.removeAttribute('href');
+                link.style.color = 'grey';
+                link.innerHTML = 'corrupted archive';
+            }
+        });
+    });
+
     document.querySelectorAll('.archive-delete-link').forEach(link => {
         const archiveID = link.id.split('-')[1];
         link.addEventListener('click', event => {

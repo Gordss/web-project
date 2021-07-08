@@ -69,6 +69,19 @@ class Storage
         return Archive::fileListToCSV($files, json_decode($stmt->fetch()['options_json'], true));
     }
 
+    public function getArchiveOptions($archiveID): ?string
+    {
+        $sql = 'SELECT options_json FROM archives WHERE id = ?';
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$archiveID]);
+        $node = $stmt->fetch();
+        if ($node == null) {
+            return null;
+        }
+
+        return $node['options_json'];
+    }
+
     public function deleteArchive($id): bool
     {
         $sql = 'DELETE FROM archives WHERE id = ?';

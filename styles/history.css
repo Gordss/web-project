@@ -28,10 +28,12 @@ table tr:first-child td {
     font-weight: bold;
 }
 
-.archive-csv-link {
+.archive-csv-link, .archive-options-link {
     color: orange;
 }
 
 .archive-delete-link {
     color: red;
+    padding-left: 10px;
+    padding-right: 10px;
 }
