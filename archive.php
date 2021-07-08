@@ -9,6 +9,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') { // Gets a previously uploaded archiv
         respondWithBadRequest('Missing ID query parameter');
     }
     $id = $_GET['id'];
+
+    if (isset($_GET['options']) && $_GET['options'] == "true") {
+        echo Storage::getInstance()->getArchiveOptions($id);
+        die;
+    }
     $archiveCSV = Storage::getInstance()->getArchiveCSV($id);
     if (!$archiveCSV) {
         respondWithNotFound("Archive with ID $id not found");
@@ -39,7 +44,8 @@ const DEFAULT_OPTIONS = array(
     'included-fields' => array('id', 'parent_id','name', 'parent-name', 'content-length', 'type', 'md5_sum','is_leaf'),
     'include-header' => true,
     'uppercase' => false,
-    'delimiter' => ','
+    'delimiter' => ',',
+    'is-leaf-numeric' => false
 );
 const MAX_FILE_BYTES_SIZE = 2097152;
 
@@ -111,6 +117,12 @@ function parseOptions(): array
     $includedFields = $options['included-fields'];
     if (!in_array('id', $includedFields) && in_array('parent_id', $includedFields)) {
         respondWithBadRequest('Chosen conversion options are invalid. Field "parent_id" can only be included if field "id" is included.');
+    }
+
+    //you cannot choose to include parent_id field without including is field
+    $includedFields = $options['included-fields'];
+    if (!in_array('is_leaf', $includedFields) && array_key_exists('is-leaf-numeric', $options)) {
+        respondWithBadRequest('Chosen conversion options are invalid. Option "is-leaf-numeric" can only be specified if field "is_leaf" is included.');
     }
 
     return $options;

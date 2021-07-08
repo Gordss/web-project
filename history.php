@@ -42,7 +42,7 @@
             <td>Archive Name</td>
             <td>MD5 sum</td>
             <td>Uploaded at</td>
-            <td colspan=2>Actions</td>
+            <td colspan=3>Actions</td>
         </tr>
         <?php
         require "Storage.php";
@@ -58,7 +58,8 @@
                 <td>$name</td>
                 <td>$md5_sum</td>
                 <td>$time</td>
-                <td class="actions-td"><a id="archive-$id-csv-link" class="archive-csv-link" href="">Download</a></td>
+                <td class="actions-td"><a id="archive-$id-csv-link" class="archive-csv-link" href="">Download CSV</a></td>
+                <td class="actions-td"><a id="archive-$id-options-link" class="archive-options-link" href="">Download options</a></td>
                 <td class="actions-td"><a id="archive-$id-delete-link" class="archive-delete-link" href="">Delete</a></td>
             </tr>
             TABLEROW;

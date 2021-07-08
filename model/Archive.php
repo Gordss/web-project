@@ -57,7 +57,15 @@ class Archive
         }
 
         foreach ($files as $file) {
-            $csv .= implode($options['delimiter'], $file->getFields($options['included-fields'])) . PHP_EOL;
+            if (array_key_exists('is-leaf-numeric', $options)) {
+                $file->setIsLeafNumeric($options['is-leaf-numeric']);
+            }
+
+            if (array_key_exists('skip-zip-filename', $options)) {
+                $file->setSkipZipFilename($options['skip-zip-filename']);
+            }
+            $file_string = implode($options['delimiter'], $file->getFields($options['included-fields'])) . PHP_EOL;
+            $csv .= $file_string;
         }
 
         return $options['uppercase'] ? strtoupper($csv) : $csv;

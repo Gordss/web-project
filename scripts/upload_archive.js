@@ -11,7 +11,10 @@ window.addEventListener('DOMContentLoaded', () => {
         "delimiter": ",",
         "included-fields": ["id","parent_id","name","type","parent-name","content-length","md5_sum","is_leaf"],
         "include-header": true,
-        "uppercase": false
+        "skip-zip-filename": false,
+        "uppercase": false,
+        "is-leaf-numeric": false
+       
 }`; // Default JSON for the input
 });
 

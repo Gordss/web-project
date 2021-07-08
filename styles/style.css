@@ -182,7 +182,7 @@ label[for=file-input] {
 }
 
 .tooltip::before {
-    content: attr(data-title) "\A\A" attr(data-delimiter) "\A\A" attr(data-fields) "\A\A" attr(data-header) "\A\A" attr(data-uppercase);
+    content: attr(data-title) "\A\A" attr(data-delimiter) "\A\A" attr(data-fields) "\A\A" attr(data-header) "\A\A" attr(data-uppercase) "\A\A" attr(data-is-leaf) "\A\A" attr(data-zip-name) "\A\A" attr(data-css);
     white-space: pre-wrap;
     position: absolute;
     left: 100%;

@@ -45,9 +45,12 @@
                                 class="tooltip"
                                 data-title="A JSON string for configuring options for the zip->CSV conversion"
                                 data-delimiter="    &quot;delimiter&quot; (string) - will be used to separate the data on each row."
-                                data-fields="    &quot;included-fields&quot; - (array of strings) - what file properties to include in the result CSV. Possible values are: &quot;id&quot;, &quot;parent_id&quot;, &quot;name&quot;, &quot;type&quot;, &quot;parent-type&quot;, &quot;content-length&quot;, &quot;md5_sum&quot;, &quot;is_leaf&quot;."
+                                data-fields="    &quot;included-fields&quot; - (array of strings) - what file properties to include in the result CSV. Possible values are: &quot;id&quot;, &quot;parent_id&quot;, &quot;name&quot;, &quot;type&quot;, &quot;parent-type&quot;, &quot;content-length&quot;, &quot;md5_sum&quot;, &quot;is_leaf&quot;, &quot;css&quot;."
                                 data-header="    &quot;included-header&quot; (boolean) - whether to include a header line in result CSV"
-                                data-uppercase="    &quot;uppercase&quot; - (boolean) - whether to convert the result CSV to uppercase.">
+                                data-uppercase="    &quot;uppercase&quot; - (boolean) - whether to convert the result CSV to uppercase."
+                                data-is-leaf="    &quot;is-leaf-numeric&quot; - (boolean) - whether to use 0/1 instead of false/true for the &quot;is_leaf&quot; field value"
+                                data-zip-name="    &quot;skip-zip-filename&quot; - (boolean) - whether to skip the zip filename in the files' names"
+                                data-css="    &quot;css-directory&quot; / &quot;css-text-file&quot; / &quot;css-image-file&quot; / &quot;css-default&quot; - (string) - value of the &quot;css&quot; column for the corresponding file type">
                             <img alt="info icon" id="info_icon" src="images/info_btn.png"/>
                         </span>
                         <a id="options_info"></a>
