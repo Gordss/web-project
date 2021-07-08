@@ -50,7 +50,9 @@
                                 data-uppercase="    &quot;uppercase&quot; - (boolean) - whether to convert the result CSV to uppercase."
                                 data-is-leaf="    &quot;is-leaf-numeric&quot; - (boolean) - whether to use 0/1 instead of false/true for the &quot;is_leaf&quot; field value"
                                 data-zip-name="    &quot;skip-zip-filename&quot; - (boolean) - whether to skip the zip filename in the files' names"
-                                data-css="    &quot;css-directory&quot; / &quot;css-text-file&quot; / &quot;css-image-file&quot; / &quot;css-default&quot; - (string) - value of the &quot;css&quot; column for the corresponding file type">
+                                data-css="    &quot;css-directory&quot; / &quot;css-text-file&quot; / &quot;css-image-file&quot; / &quot;css-default&quot; - (string) - value of the &quot;css&quot; column for the corresponding file type"
+                                data-url="    &quot;url-prefix&quot; + &quot;url-suffix&quot; + &quot;url-field-urlencoded&quot; = &quot;url&quot; - (string values) - this is how the &quot;url&quot; column is constructed. &quot;url-field-urlencoded&quot; is one of the included fields."
+                                data-cols="    &quot;const-cols&quot; - (array of strings) - empty columns to attach to result CSV">
                             <img alt="info icon" id="info_icon" src="images/info_btn.png"/>
                         </span>
                         <a id="options_info"></a>

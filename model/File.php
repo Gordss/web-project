@@ -17,6 +17,10 @@ class File
     private $cssTextFile = null;
     private $cssImageFile = null;
     private $cssDefault = null;
+    private $urlPrefix;
+    private $urlSuffix;
+    private $urlField;
+
     public function __construct($name, $parent_name, $content_length, $type, $md5_sum)
     {
         $this->name = $name;
@@ -50,6 +54,18 @@ class File
         $this->cssDefault = $value;
     }
 
+    public function setUrlPrefix($value) {
+        $this->urlPrefix = $value;
+    }
+
+    public function setUrlSuffix($value) {
+        $this->urlSuffix = $value;
+    }
+
+    public function setUrlField($value) {
+        $this->urlField = $value;
+    }
+
     public function getFields($includedFields = array('name', 'parent-name', 'content-length', 'type', 'md5_sum')): array
     {
         $fields = array();
@@ -81,6 +97,9 @@ class File
                     break;
                 case 'css':
                     array_push($fields, self::constructCssValue());
+                    break;
+                case 'url':
+                    array_push($fields, self::constructUrlValue());
                     break;
                 default:
             }
@@ -122,6 +141,26 @@ class File
         }
 
         return $this->cssDefault;
+    }
+
+    private function constructUrlValue() : string{
+        $url = $this->urlPrefix;
+        switch ($this->urlField) {
+            case 'id':
+                $url = $url . $this->id;
+                break;
+            case 'name':
+                $url = $url . self::constructNameValue($this->name, $this->skipZipFilename);
+                break;
+            case 'content-length':
+                $url = $url . $this->content_length;
+                break;
+            case 'md5_sum':
+                $url = $url . $this->md5_sum;
+                break;
+            default:
+        }
+        return $url . $this->urlSuffix;
     }
 
 }

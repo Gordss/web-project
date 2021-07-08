@@ -9,11 +9,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
     document.querySelector('#options-input').innerHTML = `{
         "delimiter": ",",
-        "included-fields": ["id","parent_id","name","type","parent-name","content-length","md5_sum","is_leaf", "css"],
+        "included-fields": ["id","parent_id","name","type","parent-name","content-length","md5_sum","is_leaf", "css", "url"],
         "include-header": true,
         "skip-zip-filename": false,
         "uppercase": false,
-        "is-leaf-numeric": false
+        "is-leaf-numeric": false,
+        "url-prefix": "http://localhost/download.php?file=",
+        "url-suffix": "&force_download=true",
+        "url-field-urlencoded": "id"
        
 }`; // Default JSON for the input
 });

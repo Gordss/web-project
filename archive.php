@@ -41,11 +41,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') { // Deletes an archive from the DB
 // Otherwise, upload an archive and return its CSV representation
 
 const DEFAULT_OPTIONS = array(
-    'included-fields' => array('id', 'parent_id','name', 'parent-name', 'content-length', 'type', 'md5_sum','is_leaf', 'css'),
+    'included-fields' => array('id', 'parent_id','name', 'parent-name', 'content-length', 'type', 'md5_sum','is_leaf', 'css', 'url'),
     'include-header' => true,
     'uppercase' => false,
     'delimiter' => ',',
-    'is-leaf-numeric' => false
+    'is-leaf-numeric' => false,
+    'url-prefix' => 'http://localhost/download.php?file=',
+    'url-suffix' => '&force_download=true',
+    'url-field-urlencoded' => 'id'
 );
 const MAX_FILE_BYTES_SIZE = 2097152;
 
@@ -101,6 +104,33 @@ function parseOptions(): array
         return DEFAULT_OPTIONS;
     }
 
+    $includedFields = $options['included-fields'];
+
+    //verify url values do not contain chosen delimiter
+    if (in_array('url', $includedFields)) {
+        if (!array_key_exists('url-prefix', $options)
+            || !array_key_exists('url-suffix', $options)
+            || !array_key_exists('url-field-urlencoded', $options)) {
+            respondWithBadRequest('Chosen conversion options are invalid. If "url" field is added the following options must be defined: "url-prefix", "url-suffix", "url-field-urlencoded."');
+        }
+
+        if (!in_array($options['url-field-urlencoded'], array('id', 'name', 'content-length', 'md5_sum'))) {
+            respondWithBadRequest('Chosen conversion options are invalid. Value of "url-field-urlencoded" must be one of the following fields: "id", "name", "content-length", "md5_sum".');
+        }
+
+        checkKeyForDelimiter('url-prefix', $options, $options['delimiter']);
+        checkKeyForDelimiter('url-suffix', $options, $options['delimiter']);
+    }
+
+    //Const columns names cannot contain chosen delimiter
+    if (array_key_exists('const-cols', $options)) {
+        foreach ($options['const-cols'] as $col) {
+            if (strpos($col, $options['delimiter']) != false) {
+                respondWithBadRequest('Chosen conversion options are invalid. Field names cannot contain the chosen delimiter.');
+            }
+        }
+    }
+
     foreach (DEFAULT_OPTIONS as $key => $value) {
         if (!array_key_exists($key, $options)) {
             $options[$key] = $value;
@@ -114,40 +144,27 @@ function parseOptions(): array
     }
 
     //you cannot choose to include parent_id field without including is field
-    $includedFields = $options['included-fields'];
     if (!in_array('id', $includedFields) && in_array('parent_id', $includedFields)) {
         respondWithBadRequest('Chosen conversion options are invalid. Field "parent_id" can only be included if field "id" is included.');
     }
 
     //verify css values do not contain chosen delimiter
-    if (in_array('css', $includedFields) && array_key_exists('is-leaf-numeric', $options)) {
-        $valid = true;
-        if (array_key_exists('css-directory', $options)) {
-            if (strpos($options['css-directory'], $options['delimiter']) != false) {
-                $valid = false;
-            }
-        }
-        if (array_key_exists('css-text-file', $options)) {
-            if (strpos($options['css-text-file'], $options['delimiter']) != false) {
-                $valid = false;
-            }
-        }
-        if (array_key_exists('css-image-file', $options)) {
-            if (strpos($options['css-image-file'], $options['delimiter']) != false) {
-                $valid = false;
-            }
-        }
-        if (array_key_exists('css-default', $options)) {
-            if (strpos($options['css-default'], $options['delimiter']) != false) {
-                $valid = false;
-            }
-        }
-        if (!$valid) {
-            respondWithBadRequest('Chosen conversion options are invalid. CSS values cannot contain the chosen delimiter.');
-        }
+    if (in_array('css', $includedFields)) {
+        checkKeyForDelimiter('css-directory', $options, $options['delimiter']);
+        checkKeyForDelimiter('css-text-file', $options, $options['delimiter']);
+        checkKeyForDelimiter('css-image-file', $options, $options['delimiter']);
+        checkKeyForDelimiter('css-default', $options, $options['delimiter']);
     }
 
     return $options;
+}
+
+function checkKeyForDelimiter($key, $array, $delimiter) {
+    if (array_key_exists($key, $array)) {
+        if (strpos($array[$key], $delimiter) != false) {
+            respondWithBadRequest('Chosen conversion options are invalid. CSS and URL values cannot contain the chosen delimiter.');
+        }
+    }
 }
 
 function respondWithBadRequest($reason)

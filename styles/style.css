@@ -182,7 +182,7 @@ label[for=file-input] {
 }
 
 .tooltip::before {
-    content: attr(data-title) "\A\A" attr(data-delimiter) "\A\A" attr(data-fields) "\A\A" attr(data-header) "\A\A" attr(data-uppercase) "\A\A" attr(data-is-leaf) "\A\A" attr(data-zip-name) "\A\A" attr(data-css);
+    content: attr(data-title) "\A\A" attr(data-delimiter) "\A\A" attr(data-fields) "\A\A" attr(data-header) "\A\A" attr(data-uppercase) "\A\A" attr(data-is-leaf) "\A\A" attr(data-zip-name) "\A\A" attr(data-css) "\A\A" attr(data-url) "\A\A" attr(data-cols);
     white-space: pre-wrap;
     position: absolute;
     left: 100%;
@@ -191,7 +191,7 @@ label[for=file-input] {
     margin-left: 1rem;
     padding: 0.625rem;
 
-    width: 400px;
+    width: 800px;
     border-radius: 0.625rem;
     background-color: rgb(255, 165, 0);
     color: #fff;
