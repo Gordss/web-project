@@ -1,6 +1,8 @@
 var delimiter = ',', typeIndex = -1;
 const MAX_FILE_SIZE_BYTES = 2097152;
 
+loadGreetingHeader();
+
 window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('form').addEventListener('submit', uploadArchive);
     document.querySelectorAll('input[type=color]').forEach(input => {
@@ -21,6 +23,31 @@ window.addEventListener('DOMContentLoaded', () => {
 }`; // Default JSON for the input
 });
 
+const logoutA = document.getElementById('logout');
+logoutA.addEventListener('click', (event) => {
+    fetch('./../../backend/api/logout.php')
+    .then(res => res.json())
+    .then(data => {
+        // TODO: add error handling when error is thrown on logging out  
+    });
+});
+
+function loadGreetingHeader() {
+    const greetingHeader = document.getElementById('greeting');
+
+    fetch('./../../backend/api/get_current_user.php')
+    .then(res => res.json())
+    .then(data => {
+        if (data.hasOwnProperty('logged') && data['logged'] == true && data.hasOwnProperty('username'))
+        {
+            greetingHeader.innerText += ` ${data['username']}`;
+        }
+        else
+        {
+            // TODO: add error handling when error is thrown to get username from server
+        }    
+    });
+}
 
 function onColorChange() {
     document.querySelectorAll('#csv-result-placeholder span').forEach(span => {

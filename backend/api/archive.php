@@ -1,6 +1,6 @@
 <?php
 
-require "Storage.php";
+require "./Storage.php";
 
 $username = authenticateUser();
 

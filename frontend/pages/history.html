@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zip to CSV converter</title>
+
+    <link rel="stylesheet" href="./../styles/style.css">
+    <link rel="stylesheet" href="./../styles/history.css">
+
+    <script defer src="./../scripts/history.js"></script>
+</head>
+<body>
+<header id="main-header">
+    <a href="upload_page.html"><h1>Zip to CSV Converter</h1></a>
+    <h3 id="greeting">Greeting, </h3>
+    <nav>
+        <ul id="navigation-list">
+            <li>
+                <a href="upload_page.html">Upload</a>
+            </li>
+            <li>
+                <a href="history.html">Upload history</a>
+            </li>
+            <li>
+                <a id="logout" href="index.html">Log out</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main>
+    <table>
+        <caption>Uploaded archives</caption>
+        <tr>
+            <td>Archive ID</td>
+            <td>Archive Name</td>
+            <td>MD5 sum</td>
+            <td>Uploaded at</td>
+            <td colspan=3>Actions</td>
+        </tr>
+    </table>
+</main>
+</body>
+</html>

@@ -1,6 +1,6 @@
 <?php
 
-require "model/Archive.php";
+require "./../model/Archive.php";
 require "Logger.php";
 
 const DIRECTORY_TYPE = "directory";
@@ -143,7 +143,7 @@ class Storage
 
     private function ensureTables()
     {
-        $query = file_get_contents('db/create_tables.sql');
+        $query = file_get_contents('./../../db/create_tables.sql');
         $this->conn->exec($query);
     }
 

@@ -1,3 +1,5 @@
+loadGreetingHeader();
+
 window.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.archive-csv-link').forEach(link => {
         const archiveID = link.id.split('-')[1];
@@ -57,3 +59,29 @@ window.addEventListener('DOMContentLoaded', () => {
         })
     });
 });
+
+const logoutA = document.getElementById('logout');
+logoutA.addEventListener('click', (event) => {
+    fetch('./../../backend/api/logout.php')
+    .then(res => res.json())
+    .then(data => {
+        // TODO: add error handling when error is thrown on logging out  
+    });
+});
+
+function loadGreetingHeader() {
+    const greetingHeader = document.getElementById('greeting');
+
+    fetch('./../../backend/api/get_current_user.php')
+    .then(res => res.json())
+    .then(data => {
+        if (data.hasOwnProperty('logged') && data['logged'] == true && data.hasOwnProperty('username'))
+        {
+            greetingHeader.innerText += ` ${data['username']}`;
+        }
+        else
+        {
+            // TODO: add error handling when error is thrown to get username from server
+        }    
+    });
+}
