@@ -1,0 +1,81 @@
+* {
+    font-family: Segoe UI, Helvetica, Arial, sans-serif;
+    color: white;
+}
+
+body {
+    background: url("../images/background.jpg") no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    background-color: #22272E;
+    margin: 0;
+}
+
+h1 {
+    text-align: center;
+    font-size: 3rem;
+    margin: 0;
+    padding-top: 120px;
+}
+
+.credentials-section {
+    width: 20%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+}
+
+.credentials-form {
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 23%;
+}
+
+.credentials-form input {
+    color: orange;
+    font-weight: bold;
+    margin-bottom: 8px;
+    border-color:white;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.credentials-section p {
+    text-align: center;
+}
+
+.credentials-section p a {
+    font-weight: bold;
+    color: orange;
+}
+
+#navigation-list {
+    display: flex;
+    list-style-type: none;
+}
+
+#navigation-list li {
+    padding: 0 0.5rem;
+}
+
+#navigation-list li a {
+    font-weight: 600;
+}
+
+.error {
+    margin-left: 30%;
+    margin-right: 30%;
+    text-decoration: underline;
+    text-decoration-color: orangered;
+    font-weight: bold;
+    text-align: center;
+    border-color:white;
+    padding: 2%;
+    border-radius: 5px;
+}
+
