@@ -20,6 +20,7 @@
         sendResponse('Password must be at least 8 characters in length and contain at least one number, one upper case letter, one lower case letter and one special character.', TRUE, 401);
     }
 
+    $password = password_hash($password, PASSWORD_DEFAULT);
     $error = Storage::getInstance()->registerUser($username, $password);
     if (!empty($error)) {
         sendResponse('This username is already taken', TRUE, 401);

@@ -102,12 +102,11 @@ class Storage
     public function verifyUserCredentials($username, $password): bool
     {
         try {
-
-            $stmt = $this->conn->prepare('SELECT Password FROM User WHERE Username = ? AND Password = ?');
-            $stmt->execute([$username, $password]);
+            $stmt = $this->conn->prepare('SELECT Password FROM User WHERE Username = ?');
+            $stmt->execute([$username]);
             $result = $stmt->fetch();
-            return $result && sizeof($result) > 0;
-        
+
+            return $result && password_verify($password, $result["Password"]);
         } catch (PDOException $e) {
             Logger::log('Could not verify user credentials: ' . $e->getMessage(),);
             return false;
