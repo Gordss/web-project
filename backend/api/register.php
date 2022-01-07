@@ -5,7 +5,7 @@
 
     $post = json_decode(file_get_contents("php://input"), true);
 
-    if (!$post && !isset($post['username']) || !isset($post['password']) || empty($post['username']) || empty($post['password'])) {
+    if (!$post || !isset($post['username']) || !isset($post['password']) || empty($post['username']) || empty($post['password'])) {
         sendResponse('Both username and password have to be set', TRUE, 401);
     }
 

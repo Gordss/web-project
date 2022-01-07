@@ -11,4 +11,24 @@
         }
     }
 
+    function respondWithBadRequest($reason)
+    {
+        http_response_code(400);
+        exit(json_encode(["error" => $reason]));
+    }
+    
+    function respondWithNotFound($reason)
+    {
+        http_response_code(404);
+        exit(json_encode(["error" => $reason]));
+    }
+    
+    function respondWithInternalServerError($reason)
+    {
+        http_response_code(500);
+        echo 'Internal server error';
+        Logger::log('Responding with 500. Reason: ' . $reason);
+        exit(json_encode(["error" => $reason]));
+    }
+
 ?>

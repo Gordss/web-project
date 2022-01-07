@@ -1,27 +1,17 @@
-CREATE TABLE IF NOT EXISTS users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(64) NOT NULL UNIQUE,
-  password VARCHAR(64) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS archives (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  uploaded_at DATETIME NOT NULL DEFAULT current_timestamp,
-  options_json VARCHAR(1024) NOT NULL,
-  FOREIGN KEY (user_id)
-    REFERENCES users(id)
-);
-
-CREATE TABLE IF NOT EXISTS nodes (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  archive_id      INT NOT NULL,
-  name            VARCHAR(2048),
-  parent_name     VARCHAR(2048),
-  content_length  INT,
-  type            VARCHAR(64),
-  md5_sum         VARCHAR(32),
-  FOREIGN KEY (archive_id)
-      REFERENCES archives(id)
-        ON DELETE CASCADE
+CREATE TABLE IF NOT EXISTS `User`(
+    `Id` INT AUTO_INCREMENT PRIMARY KEY,
+    `Username` VARCHAR(150) NOT NULL UNIQUE,
+    `Password` VARCHAR(200) NOT NULL
+); 
+CREATE TABLE IF NOT EXISTS `Convertion`(
+    `Id` INT AUTO_INCREMENT PRIMARY KEY,
+    `Fk_User_Id` INT NOT NULL,
+    `CreateDate` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `Options` VARCHAR(2048) NOT NULL,
+    `SourcePath` VARCHAR(500) NOT NULL,
+    `SourceName` VARCHAR(200) NOT NULL,
+    `SourceExtension` VARCHAR(50) NOT NULL,
+    `Md5_Sum` VARCHAR(500) NOT NULL,
+    FOREIGN KEY (`Fk_User_Id`)
+      REFERENCES `User`(`Id`)
 );

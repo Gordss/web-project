@@ -1,27 +1,23 @@
 var delimiter = ',', typeIndex = -1;
-const MAX_FILE_SIZE_BYTES = 2097152;
+const MAX_FILE_SIZE_BYTES = 524288000; // 500 MB
+const uploadForm = document.getElementById('upload-form');
+const options = document.getElementById('options-input');
 
 loadGreetingHeader();
 
-window.addEventListener('DOMContentLoaded', () => {
-    document.querySelector('form').addEventListener('submit', uploadArchive);
-    document.querySelectorAll('input[type=color]').forEach(input => {
-        input.addEventListener('input', onColorChange);
-    })
+options.innerHTML = `{
+    "delimiter": ",",
+    "included-fields": ["id","parent_id","name","type","parent-name","content-length","md5_sum","is_leaf", "css", "url"],
+    "include-header": true,
+    "skip-zip-filename": false,
+    "uppercase": false,
+    "is-leaf-numeric": false,
+    "url-prefix": "http://localhost/download.php?file=",
+    "url-suffix": "&force_download=true",
+    "url-field-urlencoded": "id"
+}`;
 
-    document.querySelector('#options-input').innerHTML = `{
-        "delimiter": ",",
-        "included-fields": ["id","parent_id","name","type","parent-name","content-length","md5_sum","is_leaf", "css", "url"],
-        "include-header": true,
-        "skip-zip-filename": false,
-        "uppercase": false,
-        "is-leaf-numeric": false,
-        "url-prefix": "http://localhost/download.php?file=",
-        "url-suffix": "&force_download=true",
-        "url-field-urlencoded": "id"
-       
-}`; // Default JSON for the input
-});
+uploadForm.addEventListener('submit', uploadArchive);
 
 const logoutA = document.getElementById('logout');
 logoutA.addEventListener('click', (event) => {
@@ -49,12 +45,6 @@ function loadGreetingHeader() {
     });
 }
 
-function onColorChange() {
-    document.querySelectorAll('#csv-result-placeholder span').forEach(span => {
-        span.style.color = getColourForLine(span.innerHTML, delimiter, typeIndex);
-    });
-}
-
 function uploadArchive(event) {
 
     event.preventDefault();
@@ -73,7 +63,7 @@ function uploadArchive(event) {
         return;
     }
 
-    const formData = new FormData(document.querySelector('form'));
+    const formData = new FormData(document.getElementById('upload-form'));
 
     var requestedDelimiter;
     try {
@@ -83,7 +73,10 @@ function uploadArchive(event) {
         terminateRequest('The options for the conversion must be a valid JSON string');
         return;
     }
+
+    // handles files with name `something.other.thing.zip`
     const nameWithoutExtension = zip.name.split('.').slice(0, -1).join('');
+    
     if (nameWithoutExtension.includes(requestedDelimiter) || nameWithoutExtension.includes('.')
         || nameWithoutExtension.includes(',')) {
         const msgAddition = requestedDelimiter !== ',' ? ` and '${requestedDelimiter}'` : '';
@@ -93,7 +86,7 @@ function uploadArchive(event) {
 
     formData.append('file', zip);
 
-    fetch('archive.php', {
+    fetch('./../../backend/api/archive.php', {
         method: 'POST',
         body: formData
     }).then(response => {
@@ -113,40 +106,22 @@ function uploadArchive(event) {
             const lines = text.split("\n");
             lines.pop(); // There is an empty line in the end
             lines.forEach(line => {
-                const lineElement = document.createElement('span');
-                lineElement.style.color = getColourForLine(line, delimiter, typeIndex);
+                const lineElement = document.createElement('div');
                 lineElement.innerHTML = line;
                 resultPlaceholder.appendChild(lineElement);
-                resultPlaceholder.appendChild(document.createElement('br'));
             })
-            createCsvDownloadLink(text, zip['name']);
-            updateDownloadHTMLLink();
+            // createCsvDownloadLink(text, zip['name']);
+            // updateDownloadHTMLLink();
         });
     })
 }
 
-function getColourForLine(line, delimiter, typeIndex) {
-    const defaultColor = document.getElementById('default-color').value;
-    if (typeIndex < 0) {
-        return defaultColor;
-    }
-    const fileType = line.split(delimiter)[typeIndex].trimEnd().toLowerCase();
-    if (['txt', 'md', 'doc', 'docx'].includes(fileType)) {
-        return document.getElementById('txt-files-color').value;
-    }
-    if (['jpg', 'png', 'gif'].includes(fileType)) {
-        return document.getElementById('img-files-color').value;
-    }
-    if ('directory' === fileType) {
-        return document.getElementById('dir-files-color').value;
-    }
-    return defaultColor;
-}
 
 function getUploadedFile() {
     return document.getElementById('file-input').files[0];
 }
 
+/*
 function createCsvDownloadLink(csvContent, zipName) {
     const fileName = zipName.substring(0, zipName.length - 3).concat("csv");
     document.getElementById("download-link-label").innerText = fileName;
@@ -168,6 +143,7 @@ function updateDownloadHTMLLink() {
     link.setAttribute('download', fileName);
     link.style.display = 'inline';
 }
+*/
 
 
 function terminateRequest(reason) {

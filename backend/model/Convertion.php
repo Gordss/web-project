@@ -2,7 +2,7 @@
 
 require 'File.php';
 
-class Archive
+class Convertion
 {
     private $files;
 
@@ -12,10 +12,10 @@ class Archive
         if (!$zip->open($path)) {
             throw new Exception('Could not open zip archive at ' . $path);
         }
-        $this->parseArchive($zip, $archiveName, $path);
+        $this->parse($zip, $archiveName, $path);
     }
 
-    private function parseArchive($zip, $archiveName, $path)
+    private function parse($zip, $archiveName, $path)
     {
         $this->files = array(new File($archiveName, null, 0, DIRECTORY_TYPE, md5_file($path)));
         for ($i = 0; $i < $zip->numFiles; $i++) {
@@ -46,7 +46,7 @@ class Archive
 
     public static function fileListToCSV($files, $options): string
     {
-        usort($files, "Archive::cmpFiles");
+        usort($files, "Convertion::cmpFiles");
         if (self::shouldGenerateIds($options)) {
             self::setFileIds($files);
         }

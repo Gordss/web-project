@@ -1,6 +1,7 @@
 <?php
 
 require "./Storage.php";
+require "./../utils/send_response.php";
 
 $username = authenticateUser();
 
@@ -8,13 +9,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') { // Gets a previously uploaded archiv
     if (!isset($_GET['id'])) {
         respondWithBadRequest('Missing ID query parameter');
     }
+
     $id = $_GET['id'];
 
+    // archive.php?id=???&optons=true     | returns convertion's options
     if (isset($_GET['options']) && $_GET['options'] == "true") {
-        echo Storage::getInstance()->getArchiveOptions($id);
-        die;
+        $options = Storage::getInstance()->getOptions($id);
+        sendResponse($options, false, 200);
     }
-    $archiveCSV = Storage::getInstance()->getArchiveCSV($id);
+
+    // archive.php?id=???&download=true     | returns zip
+    if (isset($_GET['download']) && $_GET['download'] == "true") {
+        //TODO: return zip?
+    }
+
+    // archive.php?id=???  | return the archive only
+    $archiveCSV = Storage::getInstance()->getConvertionCSV($id);
     if (!$archiveCSV) {
         respondWithNotFound("Archive with ID $id not found");
     }
@@ -39,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') { // Deletes an archive from the DB
 }
 
 // Otherwise, upload an archive and return its CSV representation
+// POST request is handled here
 
 const DEFAULT_OPTIONS = array(
     'included-fields' => array('id', 'parent_id','name', 'parent-name', 'content-length', 'type', 'md5_sum','is_leaf', 'css', 'url'),
@@ -50,7 +61,7 @@ const DEFAULT_OPTIONS = array(
     'url-suffix' => '&force_download=true',
     'url-field-urlencoded' => 'id'
 );
-const MAX_FILE_BYTES_SIZE = 2097152;
+const MAX_FILE_BYTES_SIZE = 524288000;
 
 if (!isset($_FILES['file'])) {
     respondWithBadRequest('No file uploaded');
@@ -64,11 +75,12 @@ verifyFileType();
 try {
     $storage = Storage::getInstance();
     $options = parseOptions();
-    $archive = $storage->insertArchive($_FILES["file"]["tmp_name"], $_FILES['file']['name'], $username, $options);
+    $convertion = $storage->insertConvertion($_FILES["file"]["tmp_name"], $_FILES['file']['name'], $username, $options);
 
     $appliedOptionsJSON = json_encode($options);
     header("X-Applied-Options: $appliedOptionsJSON");
-    echo $archive->toCSV($options);
+    //TODO: change to be with json_encode()
+    echo $convertion->toCSV($options);
 } catch (Exception $e) {
     respondWithInternalServerError($e->getMessage());
 }
@@ -88,7 +100,7 @@ function authenticateUser()
 {
     session_start();
     if (!isset($_SESSION['username'])) {
-        header('Location: login.php');
+        header('Location: ./../../frontend/pages/login.html');
         die;
     }
     return $_SESSION['username'];
@@ -165,26 +177,4 @@ function checkKeyForDelimiter($key, $array, $delimiter) {
             respondWithBadRequest('Chosen conversion options are invalid. CSS and URL values cannot contain the chosen delimiter.');
         }
     }
-}
-
-function respondWithBadRequest($reason)
-{
-    http_response_code(400);
-    echo $reason;
-    die;
-}
-
-function respondWithNotFound($reason)
-{
-    http_response_code(404);
-    echo $reason;
-    die;
-}
-
-function respondWithInternalServerError($reason)
-{
-    http_response_code(500);
-    echo 'Internal server error';
-    Logger::log('Responding with 500. Reason: ' . $reason);
-    die;
 }

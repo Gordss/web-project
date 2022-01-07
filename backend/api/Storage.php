@@ -1,6 +1,6 @@
 <?php
 
-require "./../model/Archive.php";
+require "./../model/Convertion.php";
 require "Logger.php";
 
 const DIRECTORY_TYPE = "directory";
@@ -18,21 +18,24 @@ class Storage
         return self::$_instance;
     }
 
-    public function insertArchive($path, $archiveName, $username, $options)
+    public function insertConvertion($path, $tempFileName, $username, $options)
     {
-        $stmt = $this->conn->prepare('INSERT INTO archives (user_id, options_json) VALUES(?, ?)');
-        $stmt->execute([$this->getUserIDByName($username), json_encode($options)]);
-        $archiveID = $this->conn->lastInsertId();
+        $location = './../files/';
+        $fileWihtoutExt = pathinfo($tempFileName)['filename'];
+        $fileExtension = pathinfo($tempFileName)['extension'];
 
-        $archive = new Archive($archiveName, $path);
-        $files = $archive->getFiles();
+        $stmt = $this->conn->prepare('INSERT INTO Convertion (FK_User_Id, Options, SourcePath, SourceName, SourceExtension, Md5_Sum) VALUES (?, ?, ?, ?, ?, ?)');
+        
+        $stmt->execute([$this->getUserIDByName($username), json_encode($options), $location, $fileWihtoutExt, $fileExtension, md5_file($path)]);
+        $convertionId = $this->conn->lastInsertId();
 
-        $sql = 'INSERT INTO nodes (archive_id, name, parent_name, content_length, type, md5_sum) VALUES(?, ?, ?, ?, ?, ?)';
-        for ($i = 0; $i < sizeof($files); $i++) {
-            $fields = array_merge([$archiveID], $files[$i]->getFields());
-            $this->conn->prepare($sql)->execute($fields);
-        }
-        return $archive;
+        $newPath = $location . $convertionId . '.' . $fileExtension;
+        // move archive to server storage
+        move_uploaded_file($path, $newPath);
+
+        $convertion = new Convertion($tempFileName, $newPath);
+
+        return $convertion;
     }
 
     public function fetchArchivesForUser($username): array
@@ -48,38 +51,34 @@ class Storage
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getArchiveCSV($archiveID): ?string
+    public function getConvertionCSV($convertionID): ?string
     {
-        $sql = 'SELECT name,parent_name,content_length,type,md5_sum FROM nodes WHERE archive_id = ? ORDER BY name';
+        $sql = 'SELECT SourcePath, SourceName, SourceExtention, Options FROM Convertion WHERE Id = ?';
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$archiveID]);
-        $nodes = $stmt->fetchAll();
-        if (sizeof($nodes) == 0) {
+        $stmt->execute([$convertionID]);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        if (sizeof($result) == 0) {
             return null;
         }
 
-        $files = array();
-        foreach ($nodes as $node) {
-            array_push($files, new File($node['name'], $node['parent_name'], $node['content_length'], $node['type'], $node['md5_sum']));
-        }
+        $convertion = new Convertion($result['SourceName'] . '.' . $result['SourceExtention'], $result['SourcePath']);
 
-        $stmt = $this->conn->prepare('SELECT options_json FROM archives WHERE id = ?');
-        $stmt->execute([$archiveID]);
-
-        return Archive::fileListToCSV($files, json_decode($stmt->fetch()['options_json'], true));
+        return $convertion->toCSV($result['Options']);
     }
 
-    public function getArchiveOptions($archiveID): ?string
+    public function getOptions($archiveID): ?string
     {
-        $sql = 'SELECT options_json FROM archives WHERE id = ?';
+        $sql = 'SELECT Options FROM Convertion WHERE id = ?';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$archiveID]);
-        $node = $stmt->fetch();
-        if ($node == null) {
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($result == null) {
             return null;
         }
 
-        return $node['options_json'];
+        return json_encode($result);
     }
 
     public function deleteArchive($id): bool
@@ -92,7 +91,7 @@ class Storage
     public function registerUser($username, $password): string
     {
         try {
-            $this->conn->prepare('INSERT INTO users (username,password) VALUES (?, ?)')
+            $this->conn->prepare('INSERT INTO User (Username,Password) VALUES (?, ?)')
                 ->execute([$username, $password]);
         } catch (PDOException $e) {
             return $e->getMessage();
@@ -103,10 +102,12 @@ class Storage
     public function verifyUserCredentials($username, $password): bool
     {
         try {
-            $stmt = $this->conn->prepare('SELECT password FROM users WHERE username = ? AND password = ?');
+
+            $stmt = $this->conn->prepare('SELECT Password FROM User WHERE Username = ? AND Password = ?');
             $stmt->execute([$username, $password]);
             $result = $stmt->fetch();
             return $result && sizeof($result) > 0;
+        
         } catch (PDOException $e) {
             Logger::log('Could not verify user credentials: ' . $e->getMessage(),);
             return false;
@@ -116,10 +117,10 @@ class Storage
     private function getUserIDByName($username): string
     {
         try {
-            $stmt = $this->conn->prepare('SELECT id FROM users WHERE username = ?');
+            $stmt = $this->conn->prepare('SELECT Id FROM User WHERE Username = ?');
             $stmt->execute([$username]);
             $result = $stmt->fetch();
-            return $result ? $result['id'] : "";
+            return $result ? $result['Id'] : "";
         } catch (PDOException $e) {
             Logger::log("Could not find user with username ${username}: " . $e->getMessage());
             return "";
