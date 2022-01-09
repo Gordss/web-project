@@ -94,7 +94,7 @@ class Storage
         $sql2 = 'SELECT SourceExtension FROM Convertion WHERE id = ?';
         $stmt2 = $this->conn->prepare($sql2);
         $stmt2->execute([$id]);
-        $result = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+        $result = $stmt2->fetch(PDO::FETCH_ASSOC);
         $file_pointer = './../files/'. $id . '.' . $result['SourceExtension'];
         unlink($file_pointer);
 
