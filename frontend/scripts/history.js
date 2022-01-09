@@ -64,6 +64,17 @@ window.addEventListener('DOMContentLoaded', () => {
                     const a_delete = document.createElement('a');
                     a_delete.className = "archive-delete-link";
                     a_delete.innerText = "Delete";
+
+                    a_delete.addEventListener('click', (e) => {
+                        fetch(`./../../backend/api/archive.php?id=${archiveId}`, {
+                            method: 'DELETE'
+                        }).then(response => {
+                            if (response.status === 204) {
+                                historyTable.removeChild(tr);
+                            }
+                        });
+                    });
+
                     td_delete.appendChild(a_delete);
 
                     const tr = document.createElement('tr');

@@ -54,20 +54,24 @@ class Storage
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getConvertionCSV($convertionID): ?string
+    public function getConvertionCSV($convertionId): ?string
     {
-        $sql = 'SELECT SourcePath, SourceName, SourceExtention, Options FROM Convertion WHERE Id = ?';
+        $sql = 'SELECT SourcePath, SourceName, SourceExtension, Options FROM Convertion WHERE Id = ?';
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$convertionID]);
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->execute([$convertionId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        if (sizeof($result) == 0) {
+        if ($result == false) {
             return null;
         }
 
-        $convertion = new Convertion($result['SourceName'] . '.' . $result['SourceExtention'], $result['SourcePath']);
+        $path = $result['SourcePath'] . $convertionId . '.' . $result['SourceExtension']; 
+        $convertion = new Convertion($result['SourceName'] . '.' . $result['SourceExtension'], $path);
 
-        return $convertion->toCSV($result['Options']);
+        // convert options to json
+        $options = json_decode($result['Options'], true);
+
+        return $convertion->toCSV($options);
     }
 
     public function getOptions($archiveID): ?string
@@ -86,8 +90,18 @@ class Storage
 
     public function deleteArchive($id): bool
     {
-        $sql = 'DELETE FROM archives WHERE id = ?';
+        //delete from file explorer
+        $sql2 = 'SELECT SourceExtension FROM Convertion WHERE id = ?';
+        $stmt2 = $this->conn->prepare($sql2);
+        $stmt2->execute([$id]);
+        $result = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+        $file_pointer = './../files/'. $id . '.' . $result['SourceExtension'];
+        unlink($file_pointer);
+
+        //delete from database
+        $sql = 'DELETE FROM Convertion WHERE id = ?';
         $stmt = $this->conn->prepare($sql);
+
         return $stmt->execute([$id]);
     }
 
