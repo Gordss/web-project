@@ -21,6 +21,9 @@ class Storage
     public function insertConvertion($path, $tempFileName, $username, $options)
     {
         $location = './../files/';
+        if ( !file_exists( $location ) && !is_dir( $location ) ) {
+            mkdir( $location );
+        }
         $fileWihtoutExt = pathinfo($tempFileName)['filename'];
         $fileExtension = pathinfo($tempFileName)['extension'];
 
