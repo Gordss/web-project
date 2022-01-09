@@ -84,8 +84,7 @@ class Storage
         if ($result == null) {
             return null;
         }
-
-        return json_encode($result);
+        return $result['Options'];
     }
 
     public function deleteArchive($id): bool

@@ -39,33 +39,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     a_downloadCSV.innerText = initialTextCsv;
                     a_downloadCSV.style.cursor = 'pointer';
 
-                    a_downloadCSV.addEventListener('click', (e) => {
-                        // first click computes the CSV from the server
-                        // following clicks will download the computed CSV
-                        if (a_downloadCSV.innerText == initialTextCsv)
-                        {
-                            fetch(`./../../backend/api/archive.php?id=${archiveId}`)
-                            .then(res => {
-                                if (res.status === 200) {
-                                    res.text().then(text => {
-                                        var lines = text.split('\n');
-                                        lines.pop(); // There is an extra line in the end
-                                        
-                                        const csvName = splitName.slice(0, -1).join('.').concat('.csv');
-                                        a_downloadCSV.setAttribute('download', csvName);
-                                        a_downloadCSV.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURI(text));
-                                        a_downloadCSV.innerText = "Download CSV";
-                                    });
-                                } else {
-                                    a_downloadCSV.removeAttribute('href');
-                                    a_downloadCSV.style.color = 'grey';
-                                    a_downloadCSV.innerText = 'corrupted archive';
-                                }
-                            });
-                        }
-                        
-                    }, false);
-                    
+                    a_downloadCSV.addEventListener('click', downloadCSV(a_downloadCSV, archiveId, splitName, initialTextCsv));
                     td_dowloadCSV.appendChild(a_downloadCSV);
                     
                     const td_dowloadOptions = document.createElement('td');
@@ -73,24 +47,27 @@ window.addEventListener('DOMContentLoaded', () => {
                     const a_downloadOptions = document.createElement('a');
                     a_downloadOptions.className = "archive-options-link";
                     a_downloadOptions.innerText = "Download options";
+
+                    a_downloadOptions.style.cursor = 'pointer';
+                    a_downloadOptions.addEventListener('click', downloadOptions(a_downloadOptions, archiveId, splitName));
                     td_dowloadOptions.appendChild(a_downloadOptions);
-                    
+
                     const td_delete = document.createElement('td');
                     td_delete.className = "actions-td";
                     const a_delete = document.createElement('a');
                     a_delete.className = "archive-delete-link";
                     a_delete.innerText = "Delete";
 
-                    a_delete.addEventListener('click', (e) => {
+                    a_delete.addEventListener('click', 
+                        () => {
                         fetch(`./../../backend/api/archive.php?id=${archiveId}`, {
                             method: 'DELETE'
                         }).then(response => {
                             if (response.status === 204) {
                                 historyTable.removeChild(tr);
                             }
-                        });
-                    });
-
+                        });}
+                    );
                     td_delete.appendChild(a_delete);
 
                     const tr = document.createElement('tr');
@@ -105,49 +82,10 @@ window.addEventListener('DOMContentLoaded', () => {
                 });   
             }
         });
-
-    /*
-    document.querySelectorAll('.archive-options-link').forEach(link => {
-        const archiveID = link.id.split('-')[1];
-        fetch(`archive.php?id=${archiveID}&options=true`).then(response => {
-            if (response.status === 200) {
-                response.text().then(text => {
-
-                    const archiveName = link.parentElement.parentElement.children[1].innerHTML;
-                    const filename = archiveName.substring(0, archiveName.length - 3).concat('json');
-                    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(text);
-
-                    link.setAttribute("href", dataStr);
-                    link.setAttribute("download", filename);
-                });
-            } else {
-                link.removeAttribute('href');
-                link.style.color = 'grey';
-                link.innerHTML = 'corrupted archive';
-            }
-        });
-    });
-
-    document.querySelectorAll('.archive-delete-link').forEach(link => {
-        const archiveID = link.id.split('-')[1];
-        link.addEventListener('click', event => {
-            event.preventDefault();
-
-            fetch(`archive.php?id=${archiveID}`, {
-                method: 'DELETE'
-            }).then(response => {
-                if (response.status === 204) {
-                    let archiveTableEntry = link.parentElement.parentElement;
-                    archiveTableEntry.parentElement.removeChild(archiveTableEntry);
-                }
-            });
-        })
-    });
-    */
 });
 
 const logoutA = document.getElementById('logout');
-logoutA.addEventListener('click', (event) => {
+logoutA.addEventListener('click', () => {
     fetch('./../../backend/api/logout.php')
     .then(res => res.json())
     .then(data => {
@@ -171,4 +109,51 @@ function loadGreetingHeader() {
             // TODO: add error handling when error is thrown to get username from server
         }    
     });
+}
+
+function downloadCSV(a_downloadCSV, archiveId, splitName, initialTextCsv) {
+    // first click computes the CSV from the server
+    // following clicks will download the computed CSV
+    if (a_downloadCSV.innerText == initialTextCsv) {
+        fetch(`./../../backend/api/archive.php?id=${archiveId}`)
+        .then(res => {
+            if (res.status === 200) {
+                res.text().then(text => {
+                    var lines = text.split('\n');
+                    lines.pop(); // There is an extra line in the end
+                    
+                    const csvName = splitName.slice(0, -1).join('.').concat('.csv');
+                    a_downloadCSV.setAttribute('download', csvName);
+                    a_downloadCSV.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURI(text));
+                    a_downloadCSV.innerText = "Download CSV";
+                });
+            } else {
+                a_downloadCSV.removeAttribute('href');
+                a_downloadCSV.style.color = 'grey';
+                a_downloadCSV.innerText = 'corrupted archive';
+            }
+        });
+    }
+}
+
+function downloadOptions(aTag, archiveId, splitName) {
+    fetch(`./../../backend/api/archive.php?id=${archiveId}&options=true`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.hasOwnProperty('error'))
+        {
+            aTag.removeAttribute('href');
+            aTag.style.color = 'grey';
+            aTag.innerHTML = 'corrupted archive';
+        }
+        else if (data.hasOwnProperty('success'))
+        {
+            const filename = splitName.slice(0, -1).join('.').concat('.json');
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(data['success']);
+
+            aTag.setAttribute("href", dataStr);
+            aTag.setAttribute("download", filename);
+            aTag.removeEventListener('click', downloadOptions);
+        }
+    })
 }

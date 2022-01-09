@@ -12,15 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') { // Gets a previously uploaded archiv
 
     $id = $_GET['id'];
 
-    // archive.php?id=???&optons=true     | returns convertion's options
+    // archive.php?id=???&options=true     | returns convertion's options
     if (isset($_GET['options']) && $_GET['options'] == "true") {
         $options = Storage::getInstance()->getOptions($id);
         sendResponse($options, false, 200);
-    }
-
-    // archive.php?id=???&download=true     | returns zip
-    if (isset($_GET['download']) && $_GET['download'] == "true") {
-        //TODO: return zip?
     }
 
     // archive.php?id=???  | return the archive only
