@@ -16,7 +16,14 @@ window.addEventListener('DOMContentLoaded', () => {
                     td_id.innerText = archiveId;
 
                     const td_name = document.createElement('td');
-                    td_name.innerText = element['name'];
+                    const a_name = document.createElement('a');
+                    a_name.className = "archive-download-link";
+                    a_name.innerText = element["name"];
+                    const splitName = element["name"].split('.');
+                    const serveName = archiveId.concat('.' + splitName[splitName.length - 1]);
+                    a_name.setAttribute('href', `./../../backend/files/${serveName}`);
+                    a_name.setAttribute('download', element["name"]);
+                    td_name.appendChild(a_name);
 
                     const td_md5Sum = document.createElement('td');
                     td_md5Sum.innerText = element['md5-sum'];
@@ -28,19 +35,26 @@ window.addEventListener('DOMContentLoaded', () => {
                     td_dowloadCSV.className = "actions-td";
                     const a_downloadCSV = document.createElement('a');
                     a_downloadCSV.className = "archive-csv-link";
-                    a_downloadCSV.innerText = "Download CSV";
+                    const initialTextCsv = "Load CSV";
+                    a_downloadCSV.innerText = initialTextCsv;
+                    a_downloadCSV.style.cursor = 'pointer';
 
-                    /*
                     a_downloadCSV.addEventListener('click', (e) => {
-                        fetch(`./../../backend/api/archive.php?id=${archiveId}`)
+                        // first click computes the CSV from the server
+                        // following clicks will download the computed CSV
+                        if (a_downloadCSV.innerText == initialTextCsv)
+                        {
+                            fetch(`./../../backend/api/archive.php?id=${archiveId}`)
                             .then(res => {
                                 if (res.status === 200) {
                                     res.text().then(text => {
                                         var lines = text.split('\n');
                                         lines.pop(); // There is an extra line in the end
-                    
-                                        link.setAttribute('download', element['name']);
-                                        link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURI(text));
+                                        
+                                        const csvName = splitName.slice(0, -1).join('.').concat('.csv');
+                                        a_downloadCSV.setAttribute('download', csvName);
+                                        a_downloadCSV.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURI(text));
+                                        a_downloadCSV.innerText = "Download CSV";
                                     });
                                 } else {
                                     a_downloadCSV.removeAttribute('href');
@@ -48,8 +62,10 @@ window.addEventListener('DOMContentLoaded', () => {
                                     a_downloadCSV.innerText = 'corrupted archive';
                                 }
                             });
-                    });
-                    */
+                        }
+                        
+                    }, false);
+                    
                     td_dowloadCSV.appendChild(a_downloadCSV);
                     
                     const td_dowloadOptions = document.createElement('td');
@@ -91,27 +107,6 @@ window.addEventListener('DOMContentLoaded', () => {
         });
 
     /*
-    document.querySelectorAll('.archive-csv-link').forEach(link => {
-        const archiveID = link.id.split('-')[1];
-        fetch(`archive.php?id=${archiveID}`).then(response => {
-            if (response.status === 200) {
-                response.text().then(text => {
-                    var lines = text.split('\n');
-                    lines.pop(); // There is an extra line in the end
-
-                    const archiveName = link.parentElement.parentElement.children[1].innerHTML;
-                    const filename = archiveName.substring(0, archiveName.length - 3).concat('csv');
-                    link.setAttribute('download', filename);
-                    link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURI(text));
-                });
-            } else {
-                link.removeAttribute('href');
-                link.style.color = 'grey';
-                link.innerHTML = 'corrupted archive';
-            }
-        });
-    });
-
     document.querySelectorAll('.archive-options-link').forEach(link => {
         const archiveID = link.id.split('-')[1];
         fetch(`archive.php?id=${archiveID}&options=true`).then(response => {

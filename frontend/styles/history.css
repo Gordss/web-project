@@ -28,7 +28,7 @@ table tr:first-child td {
     font-weight: bold;
 }
 
-.archive-csv-link, .archive-options-link {
+.archive-download-link, .archive-csv-link, .archive-options-link {
     color: orange;
 }
 

@@ -1,4 +1,4 @@
 .idea/
 errors.log
 .vscode/
-.backend/files/
+/backend/files
