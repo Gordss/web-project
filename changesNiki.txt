@@ -1,2 +1,0 @@
--когато кликнеш на logout вече те извежда на login страницата 
--нов стил на login/register page. Нов файл за стила на login/register pages - intro-page.css

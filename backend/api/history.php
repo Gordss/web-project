@@ -13,10 +13,10 @@
 
     $response = [];
     foreach ($archives as $archive) {
-        $id = $archive['id'];
-        $date = $archive['uploaded_at'];
-        $name = $archive['name'];
-        $md5_sum = $archive['md5_sum'];
+        $id = $archive['Id'];
+        $date = $archive['CreateDate'];
+        $name = $archive['SourceName'].'.'.$archive['SourceExtension'];
+        $md5_sum = $archive['Md5_Sum'];
 
         array_push($response, ['id' => $id, 'name' => $name, 'md5-sum' => $md5_sum, 'create-date' => $date]);
     }

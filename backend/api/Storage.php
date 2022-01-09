@@ -41,9 +41,9 @@ class Storage
     public function fetchArchivesForUser($username): array
     {
         $sql = <<<SQL
-        SELECT a.id, a.uploaded_at, n.md5_sum, n.name FROM archives a
-            JOIN nodes n on n.archive_id=a.id AND ISNULL(n.parent_name)
-        WHERE user_id = ?;
+        SELECT c.Id, c.CreateDate, c.Md5_Sum, c.SourceName, c.SourceExtension FROM Convertion c
+            JOIN user u on u.Id=c.Fk_User_Id
+        WHERE u.Id = ?;
         SQL;
 
         $stmt = $this->conn->prepare($sql);
