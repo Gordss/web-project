@@ -1,21 +1,42 @@
 var delimiter = ',', typeIndex = -1;
 const MAX_FILE_SIZE_BYTES = 524288000; // 500 MB
 const uploadForm = document.getElementById('upload-form');
-const options = document.getElementById('options-input');
+options = document.getElementById('options-input');
 
 loadGreetingHeader();
 
 options.innerHTML = `{
-    "delimiter": ",",
-    "included-fields": ["id","parent_id","name","type","parent-name","content-length","md5_sum","is_leaf", "css", "url"],
-    "include-header": true,
-    "skip-zip-filename": false,
-    "uppercase": false,
-    "is-leaf-numeric": false,
-    "url-prefix": "http://localhost/download.php?file=",
-    "url-suffix": "&force_download=true",
-    "url-field-urlencoded": "id"
+\t"delimiter": ",",
+\t"included-fields": ["id","parent_id","name","type","parent-name","content-length","md5_sum","is_leaf", "css", "url"],
+\t"include-header": true,
+\t"skip-zip-filename": false,
+\t"uppercase": false,
+\t"is-leaf-numeric": false,
+\t"url-prefix": "http://localhost/download.php?file=",
+\t"url-suffix": "&force_download=true",
+\t"url-field-urlencoded": "id"
 }`;
+
+options.addEventListener('keydown', (e) => {
+    const beforeKey = options.selectionStart;
+    const afterKey = options.selectionEnd;
+
+    if(e.key == 'Tab') {
+        e.preventDefault();
+        options.value = options.value.substring(0, beforeKey) + "\t" + options.value.substring(afterKey);
+        options.selectionEnd = beforeKey + 1;
+    }
+    else if(e.key == 'Enter') {
+        e.preventDefault();
+        options.value = options.value.substring(0, beforeKey) + "\n\t" + options.value.substring(afterKey);
+        options.selectionEnd = beforeKey + 2;
+    }
+    else if(e.key == '\"') {
+        options.value = options.value.substring(0, beforeKey) + "\"" + options.value.substring(afterKey);
+        options.selectionEnd = beforeKey;
+    }
+})
+
 
 uploadForm.addEventListener('submit', uploadArchive);
 
@@ -115,7 +136,6 @@ function uploadArchive(event) {
         });
     })
 }
-
 
 function getUploadedFile() {
     return document.getElementById('file-input').files[0];
