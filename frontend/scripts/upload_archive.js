@@ -32,8 +32,13 @@ options.addEventListener('keydown', (e) => {
         options.selectionEnd = beforeKey + 2;
     }
     else if(e.key == '\"') {
-        options.value = options.value.substring(0, beforeKey) + "\"" + options.value.substring(afterKey);
-        options.selectionEnd = beforeKey;
+        if(options.value.substring(beforeKey, beforeKey + 1) == "\"") {
+            options.selectionEnd = beforeKey + 1;
+        }
+        else {
+            options.value = options.value.substring(0, beforeKey) + "\"" + options.value.substring(afterKey);
+            options.selectionEnd = beforeKey;
+        }
     }
 })
 
