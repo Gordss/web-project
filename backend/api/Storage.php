@@ -105,11 +105,11 @@ class Storage
         return $stmt->execute([$id]);
     }
 
-    public function registerUser($username, $password): string
+    public function registerUser($email, $username, $password, $token): string
     {
         try {
-            $this->conn->prepare('INSERT INTO User (Username,Password) VALUES (?, ?)')
-                ->execute([$username, $password]);
+            $this->conn->prepare('INSERT INTO User (Email,Username,Password,Token) VALUES (?, ?, ?, ?)')
+                ->execute([$email, $username, $password, $token]);
         } catch (PDOException $e) {
             return $e->getMessage();
         }
@@ -128,6 +128,61 @@ class Storage
             Logger::log('Could not verify user credentials: ' . $e->getMessage(),);
             return false;
         }
+    }
+
+    public function verifyEmailandUsername($email, $username): bool
+    {
+        try {
+            $stmt = $this->conn->prepare('SELECT Username FROM User WHERE Email = ?');
+            $stmt->execute([$email]);
+            $count = $stmt->rowCount();
+            $flag = true;
+            if($count == 0)
+            {
+                $flag = false;
+            }
+            $result = $stmt->fetch();
+
+            return $result && $flag && ($username === $result["Username"]);
+        } catch (PDOException $e) {
+            Logger::log('Invalid combination of email and username: ' . $e->getMessage(),);
+            return false;
+        }
+    }
+
+    public function verifyEmail($email): bool
+    {
+        try {
+            $stmt = $this->conn->prepare('SELECT Email FROM User WHERE Email = ?');
+            $stmt->execute([$email]);
+            $count = $stmt->rowCount();
+            $flag = true;
+            if($count == 0)
+            {
+                $flag = false;
+            }
+            $result = $stmt->fetch();
+
+            return $result && $flag;
+        } catch (PDOException $e) {
+            Logger::log('Invalid email' . $e->getMessage(),);
+            return false;
+        }
+    }
+
+    public function changePassword($email, $password): bool 
+    {
+        try {
+            $stmt = $this->conn->prepare('Update User SET Password = ? WHERE Email = ?');
+            $stmt->execute([$password, $email]);
+            $result = $stmt->fetch();
+
+            return $result;
+        } catch (PDOException $e) {
+            Logger::log('Invalid combination of email and username: ' . $e->getMessage(),);
+            return false;
+        }
+
     }
 
     private function getUserIDByName($username): string

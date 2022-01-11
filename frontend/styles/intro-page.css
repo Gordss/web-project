@@ -54,17 +54,9 @@ h1 {
     color: orange;
 }
 
-#navigation-list {
-    display: flex;
-    list-style-type: none;
-}
-
-#navigation-list li {
-    padding: 0 0.5rem;
-}
-
-#navigation-list li a {
-    font-weight: 600;
+.bottom-text {
+    font-size: 0.8rem;
+    margin-top: 0;
 }
 
 .error {

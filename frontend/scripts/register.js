@@ -5,10 +5,12 @@ registerForm.addEventListener('submit', (event) => {
 
     event.preventDefault();
 
+    const emailElement = document.getElementById('email');
     const usernameElement = document.getElementById('username');
     const passwordElement = document.getElementById('password');
 
     const userData = {
+        email: emailElement.value,
         username: usernameElement.value,
         password: passwordElement.value
     };
@@ -25,6 +27,7 @@ registerForm.addEventListener('submit', (event) => {
         if (data.hasOwnProperty('error'))
         {
             errorDiv.innerText = data['error'];
+            emailElement = '';
             usernameElement.value = '';
             passwordElement.value = '';
         }

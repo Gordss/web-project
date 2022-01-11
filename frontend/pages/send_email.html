@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zip to CSV Converter</title>
+    <link rel="stylesheet" href="./../styles/intro-page.css">
+    <script defer src="./../scripts/send_email.js"></script>
+</head>
+<body>
+<header id="main-header">
+    <h1>Send email to reset password</h1>
+</header>
+<main>
+    <section id="form" class="credentials-section">
+        <form id="email-form" class="credentials-form">
+            <input type="email" id="email" placeholder="Email" required/>
+            <input type="text" id="username" placeholder="Username" required/>
+            <input type="submit" value="Send email"/>
+        </form>
+        <p>Remembered password?</p>
+        <p class="bottom-text"><a href="login.html" id="register-here">Go to login</a></p>
+        <p id="msg" style="visibility:hidden">Check your email!</p>
+    </section>
+    
+    <div id="error" class="error"></div>
+</main>
+</body>
+</html>
