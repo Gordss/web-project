@@ -20,6 +20,10 @@ class File
     private $urlPrefix;
     private $urlSuffix;
     private $urlField;
+    
+    private $textFileColor = null;
+    private $imageFileColor = null;
+    private $directoryColor = null;
 
     public function __construct($name, $parent_name, $content_length, $type, $md5_sum)
     {
@@ -64,6 +68,18 @@ class File
 
     public function setUrlField($value) {
         $this->urlField = $value;
+    }
+
+    public function setTextFileColor($value) {
+        $this->textFileColor = $value;
+    }
+
+    public function setImageFileColor($value) {
+        $this->imageFileColor = $value;
+    }
+
+    public function setDirectoryColor($value) {
+        $this->directoryColor = $value;
     }
 
     public function getFields($includedFields = array('name', 'parent-name', 'content-length', 'type', 'md5_sum')): array

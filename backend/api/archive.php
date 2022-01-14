@@ -163,6 +163,8 @@ function parseOptions(): array
         checkKeyForDelimiter('css-default', $options, $options['delimiter']);
     }
 
+    //TODO: color options handling
+
     return $options;
 }
 

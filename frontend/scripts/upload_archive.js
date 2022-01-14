@@ -14,7 +14,12 @@ options.innerHTML = `{
 \t"is-leaf-numeric": false,
 \t"url-prefix": "http://localhost/download.php?file=",
 \t"url-suffix": "&force_download=true",
-\t"url-field-urlencoded": "id"
+\t"url-field-urlencoded": "id",
+\t"file-type-color" : {
+\t\t"text": "rgb(0, 0, 0)",
+\t\t"image": "rgb(0, 0, 0)",
+\t\t"directory": "rgb(0, 0, 0)"
+\t}
 }`;
 
 options.addEventListener('keydown', (e) => {
@@ -41,7 +46,6 @@ options.addEventListener('keydown', (e) => {
         }
     }
 })
-
 
 uploadForm.addEventListener('submit', uploadArchive);
 
@@ -126,6 +130,8 @@ function uploadArchive(event) {
             resultPlaceholder.style.color = 'white';
 
             const options = JSON.parse(response.headers.get('X-Applied-Options'));
+            const fileColor = options['file-type-color'];
+
             delimiter = options.delimiter ? options.delimiter : ',';
             typeIndex = options['included-fields'] ? options['included-fields'].indexOf('type') : -1;
 
@@ -134,12 +140,29 @@ function uploadArchive(event) {
             lines.forEach(line => {
                 const lineElement = document.createElement('div');
                 lineElement.innerHTML = line;
+                lineElement.style.color = colorFile(line, delimiter, typeIndex, fileColor);
                 resultPlaceholder.appendChild(lineElement);
             })
-            // createCsvDownloadLink(text, zip['name']);
-            // updateDownloadHTMLLink();
         });
     })
+}
+
+function colorFile(line, delimiter, typeIndex, fileColor) {
+    const defaultColor = "black";
+    if (typeIndex < 0) {
+        return defaultColor;
+    }
+    const fileType = line.split(delimiter)[typeIndex].toLowerCase().trimEnd();
+    if (['txt', 'md', 'doc', 'docx'].includes(fileType)) {
+        return fileColor['text'];
+    }
+    if (['jpg', 'png', 'gif'].includes(fileType)) {
+        return fileColor['image'];
+    }
+    if ('directory' === fileType) {
+        return fileColor['directory'];
+    }
+    return defaultColor;
 }
 
 function getUploadedFile() {
@@ -169,7 +192,6 @@ function updateDownloadHTMLLink() {
     link.style.display = 'inline';
 }
 */
-
 
 function terminateRequest(reason) {
     let resultPlaceholder = document.getElementById('csv-result-placeholder');

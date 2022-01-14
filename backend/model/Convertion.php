@@ -98,6 +98,19 @@ class Convertion
                 $file->setUrlField($options['url-field-urlencoded']);
             }
 
+            if (array_key_exists('file-type-color', $options)) {
+                $fileColor = $options['file-type-color'];
+                if (array_key_exists('text', $fileColor)) {
+                    $file->setTextFileColor($fileColor['text']);
+                }
+                if (array_key_exists('image', $fileColor)) {
+                    $file->setImageFileColor($fileColor['image']);
+                }
+                if (array_key_exists('directory', $fileColor)) {
+                    $file->setDirectoryColor($fileColor['directory']);
+                }
+            }
+
             $file_string = implode($options['delimiter'], $file->getFields($options['included-fields']));
 
             if (array_key_exists('const-cols', $options)) {
