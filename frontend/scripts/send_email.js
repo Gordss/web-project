@@ -31,6 +31,7 @@ loginForm.addEventListener('submit', (event) => {
         else if (data.hasOwnProperty('success'))
         {
             document.getElementById("msg").style.visibility = "visible";
+            //errorDiv.style.visibility = "hidden";
         }    
     });
 });

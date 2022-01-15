@@ -14,6 +14,7 @@
     $username = $post['username'];
 
     $userIsValid = Storage::getInstance()->verifyEmailandUsername($email, $username);
+    $token = Storage::getInstance()->getToken($email);
     
     if ($userIsValid) {
         //send email
@@ -26,7 +27,7 @@
         $message = (new Swift_Message('Change your password'))
             ->setFrom('webconverter7@gmail.com')
             ->setTo($email)
-            ->setBody('Click on the link to change your password: http://localhost/WEBproject/web-project/frontend/pages/change_password.html');
+            ->setBody("Click on the link to change your password: http://localhost/web-project/frontend/pages/validation.html?token=" . $token . " .");
         
         $result = $mailer->send($message);
 

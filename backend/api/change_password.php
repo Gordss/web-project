@@ -5,6 +5,7 @@
 
     $post = json_decode(file_get_contents("php://input"), true);
 
+
     if (!isset($post['email']) || !isset($post['password']) || empty($post['email'] || empty($post['password']))) {
         sendResponse("Both email and password have to be set", TRUE, 401);
     }
@@ -12,16 +13,21 @@
     $email = $post['email'];
     $password = $post['password'];
 
+    if (!preg_match("#^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$#", $password)) {
+        sendResponse('Password must be at least 8 characters in length and contain at least one number, one upper case letter, one lower case letter and one special character.', TRUE, 401);
+    }
+
     $userIsValid = Storage::getInstance()->verifyEmail($email);
     
     if ($userIsValid) {
 
         $password = password_hash($password, PASSWORD_DEFAULT);
         $PasswordChanged = Storage::getInstance()->changePassword($email, $password);
+        //$TokenChanged = Storage::getInstance()->changeToken($email) or in changePassword function;
         sendResponse("Ok", FALSE, 200);
     }
     else {
-        sendResponse("An invalid combination of email and username was entered", TRUE, 401);
-    }    
+        sendResponse("An invalid email was entered", TRUE, 401);
+    }   
 
 ?>

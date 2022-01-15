@@ -17,12 +17,24 @@
         sendResponse('Invalid email', TRUE, 401);
     }
 
-    if (strlen($username) < 8) {
-        sendResponse('Username must be at least 8 characters in length', TRUE, 401);
+    if (strlen($username) < 3) {
+        sendResponse('Username must be at least 3 characters in length', TRUE, 401);
     }
 
-    if (!preg_match("#.*^(?=.{8,20})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W).*$#", $password)) {
+    if (!preg_match("#^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$#", $password)) {
         sendResponse('Password must be at least 8 characters in length and contain at least one number, one upper case letter, one lower case letter and one special character.', TRUE, 401);
+    }
+
+    $uniqueEmail = Storage::getInstance()->isUniqueEmail($email);
+    if(!$uniqueEmail)
+    {
+        sendResponse('Already registered with this email', TRUE, 401);
+    }
+
+    $uniqueUsername = Storage::getInstance()->isUniqueUsername($username);
+    if(!$uniqueUsername)
+    {
+        sendResponse('Username is already used. Try different username', TRUE, 401);
     }
 
     $password = password_hash($password, PASSWORD_DEFAULT);

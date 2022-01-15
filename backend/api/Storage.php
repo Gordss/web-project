@@ -88,6 +88,19 @@ class Storage
         return $result['Options'];
     }
 
+    public function getToken($email): ?string
+    {
+        $sql = 'SELECT Token FROM User WHERE Email = ?';
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$email]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($result == null) {
+            return null;
+        }
+        return $result['Token'];
+    }
+
     public function deleteArchive($id): bool
     {
         //delete from file explorer
@@ -103,6 +116,46 @@ class Storage
         $stmt = $this->conn->prepare($sql);
 
         return $stmt->execute([$id]);
+    }
+
+    public function isUniqueEmail($email): bool
+    {
+        try {
+            $stmt = $this->conn->prepare('SELECT Username FROM User WHERE Email = ?');
+            $stmt->execute([$email]);
+            $count = $stmt->rowCount();
+            $flag = true;
+            if($count == 0)
+            {
+                return true;
+            }
+
+            return false;
+
+        } catch (PDOException $e) {
+            Logger::log('Invalid combination of email and username: ' . $e->getMessage(),);
+            return false;
+        }
+    }
+
+    public function isUniqueUsername($username): bool
+    {
+        try {
+            $stmt = $this->conn->prepare('SELECT Email FROM User WHERE Username = ?');
+            $stmt->execute([$username]);
+            $count = $stmt->rowCount();
+            $flag = true;
+            if($count == 0)
+            {
+                return true;
+            }
+
+            return false;
+
+        } catch (PDOException $e) {
+            Logger::log('Invalid combination of email and username: ' . $e->getMessage(),);
+            return false;
+        }
     }
 
     public function registerUser($email, $username, $password, $token): string
@@ -170,16 +223,37 @@ class Storage
         }
     }
 
-    public function changePassword($email, $password): bool 
+    public function verifyToken($token): bool
     {
         try {
-            $stmt = $this->conn->prepare('Update User SET Password = ? WHERE Email = ?');
-            $stmt->execute([$password, $email]);
+            $stmt = $this->conn->prepare('SELECT Email FROM User WHERE Token = ?');
+            $stmt->execute([$token]);
+            $count = $stmt->rowCount();
+            $result = $stmt->fetch();
+            if($count == 0)
+            {
+                return false;
+            }
+
+            return true;
+
+        } catch (PDOException $e) {
+            Logger::log('Could not verify user token: ' . $e->getMessage(),);
+            return false;
+        }
+    }
+
+    public function changePassword($email, $password): bool 
+    {
+        $token = bin2hex(random_bytes(50));
+        try {
+            $stmt = $this->conn->prepare('Update User SET Password = ?, Token = ? WHERE Email = ?');
+            $stmt->execute([$password, $token, $email]);
             $result = $stmt->fetch();
 
             return $result;
         } catch (PDOException $e) {
-            Logger::log('Invalid combination of email and username: ' . $e->getMessage(),);
+            Logger::log('Unable to change password: ' . $e->getMessage(),);
             return false;
         }
 
