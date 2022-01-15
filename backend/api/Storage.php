@@ -41,17 +41,45 @@ class Storage
         return $convertion;
     }
 
-    public function fetchArchivesForUser($username): array
+    public function getConvertionCountForUser($username): int
     {
-        $sql = <<<SQL
-        SELECT c.Id, c.CreateDate, c.Md5_Sum, c.SourceName, c.SourceExtension FROM Convertion c
+        $sql = 'SELECT COUNT(1) AS Count FROM Convertion c JOIN user u ON u.Id = c.Fk_User_Id WHERE u.Username = ?';
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$username]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC)['Count'];
+    }
+
+    public function fetchArchivesForUser($username, $itemPerPage = null, $offset = null): array
+    {
+        $userId = $this->getUserIDByName($username);
+
+        $sql = '
+        SELECT c.Id, c.CreateDate, c.Md5_Sum, c.SourceName, c.SourceExtension
+        FROM
+            Convertion c
             JOIN user u on u.Id=c.Fk_User_Id
-        WHERE u.Id = ?
-        ORDER BY c.CreateDate DESC;
-        SQL;
+        WHERE u.Id = :id
+        ORDER BY c.Id DESC';
+        
+        if ($itemPerPage != null && $offset != null)
+        {
+            $sql .= '
+            LIMIT :itemPerPage
+            OFFSET :offset';
+        }
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$this->getUserIDByName($username)]);
+        $stmt->bindValue("id", $userId, PDO::PARAM_INT);
+
+        if ($itemPerPage != null && $offset != null)
+        {
+            $stmt->bindValue("offset", $offset, PDO::PARAM_INT);
+            $stmt->bindValue("itemPerPage", $itemPerPage, PDO::PARAM_INT);   
+        }
+
+        $stmt->execute();
+        
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

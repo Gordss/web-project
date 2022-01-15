@@ -28,16 +28,23 @@
     </nav>
 </header>
 <main>
+    <h1 id="no-records-label" class="centered-text"></h1>
     <table id="history-table">
-        <caption>Uploaded archives</caption>
+        <caption>Convertions</caption>
         <tr>
-            <td>Archive ID</td>
-            <td>Archive Name</td>
-            <td>MD5 sum</td>
-            <td>Uploaded at</td>
+            <td>ID</td>
+            <td>Name</td>
+            <td>MD5 Sum</td>
+            <td>Create Date</td>
             <td colspan=3>Actions</td>
         </tr>
     </table>
+
+    <div id="table-navigation" class="centered-text">
+        <button id="btn-prev">Back</button>
+        <span id="curr-page"></span>
+        <button id="btn-next">Next</button>
+    </div>
 </main>
 </body>
 </html>

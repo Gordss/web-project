@@ -1,10 +1,70 @@
+const convertionsPerPage = 10;
+let currentPage = 1;
+
 const historyTable = document.getElementById('history-table');
 
 loadGreetingHeader();
 
-window.addEventListener('DOMContentLoaded', () => {
+window.onload = function ()
+{
+    loadPage(1);
+    
+    const btnPrev = document.getElementById('btn-prev');
+    btnPrev.onclick = prevPage;
+    const btnNext = document.getElementById('btn-next');
+    btnNext.onclick = nextPage;
+}
 
-    fetch('./../../backend/api/history.php')
+const logoutA = document.getElementById('logout');
+logoutA.addEventListener('click', () => {
+    fetch('./../../backend/api/logout.php')
+    .then(res => res.json())
+    .then(data => {
+        // TODO: add error handling when error is thrown on logging out  
+    });
+});
+
+function initializeTable(table)
+{
+    
+}
+
+async function loadPage(pageNumber)
+{
+    const noRecordsLabel = document.getElementById('no-records-label');
+    const historyTable = document.getElementById('history-table');
+    const tableNavigationDiv = document.getElementById('table-navigation');
+    const totalConvertionsCount = await getConvertionsCount();
+    // check if any convertions exist
+    if (totalConvertionsCount == 0)
+    {
+        noRecordsLabel.innerText = 'There are no convertions!';
+        historyTable.style.display = 'none';
+        tableNavigationDiv.style.display = 'none';
+        return;
+    }
+    else
+    {
+        noRecordsLabel.style.display = 'none';
+    }
+    
+    while (historyTable.childNodes.length > 4)
+    {
+        historyTable.removeChild(historyTable.lastElementChild);    
+    }
+
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const currentPage = document.getElementById('curr-page');
+
+    // page number validation
+    if (pageNumber < 1) pageNumber = 1;
+    if (pageNumber > numPages(totalConvertionsCount)) pageNumber = numPages(totalConvertionsCount);
+
+    currentPage.innerText = `Page: ${pageNumber}`;
+    const offset = (pageNumber - 1) * convertionsPerPage;
+
+    fetch(`./../../backend/api/history.php?perpage=${convertionsPerPage}&offset=${offset}`)
         .then(res => res.json())
         .then(data => {
             
@@ -39,7 +99,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     a_downloadCSV.innerText = initialTextCsv;
                     a_downloadCSV.style.cursor = 'pointer';
 
-                    a_downloadCSV.addEventListener('click', downloadCSV(a_downloadCSV, archiveId, splitName, initialTextCsv));
+                    a_downloadCSV.addEventListener('click', () => downloadCSV(a_downloadCSV, archiveId, splitName, initialTextCsv));
                     td_dowloadCSV.appendChild(a_downloadCSV);
                     
                     const td_dowloadOptions = document.createElement('td');
@@ -57,6 +117,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     const a_delete = document.createElement('a');
                     a_delete.className = "archive-delete-link";
                     a_delete.innerText = "Delete";
+                    a_delete.style.cursor = 'pointer';
 
                     a_delete.addEventListener('click', 
                         () => {
@@ -82,16 +143,52 @@ window.addEventListener('DOMContentLoaded', () => {
                 });   
             }
         });
-});
+    
+    // make buttons disabled if user is on first or last page
+    btnPrev.disabled = pageNumber == 1;
+    btnNext.disabled = pageNumber == numPages(totalConvertionsCount);
+}
 
-const logoutA = document.getElementById('logout');
-logoutA.addEventListener('click', () => {
-    fetch('./../../backend/api/logout.php')
-    .then(res => res.json())
-    .then(data => {
-        // TODO: add error handling when error is thrown on logging out  
-    });
-});
+async function getConvertionsCount()
+{
+    return fetch('./../../backend/api/history.php?count=true')
+        .then(res => res.json())
+        .then(data => {
+            if (data.hasOwnProperty('success'))
+            {
+                return +data['success'];
+            }
+            else {
+                // TODO: add error handling
+                return 0;
+            }
+        });
+}
+
+function prevPage()
+{
+    if (currentPage > 1)
+    {
+        currentPage--;
+        loadPage(currentPage);
+    }
+}
+
+function nextPage()
+{
+    getConvertionsCount()
+        .then(totalConvertionCount => {
+            if (currentPage < numPages(totalConvertionCount)) {
+                currentPage++;
+                loadPage(currentPage);
+            }
+        });
+}
+
+function numPages(totalConvertionCount)
+{
+    return Math.ceil(totalConvertionCount / convertionsPerPage);
+}
 
 function loadGreetingHeader() {
     const greetingHeader = document.getElementById('greeting');
@@ -157,3 +254,4 @@ function downloadOptions(aTag, archiveId, splitName) {
         }
     })
 }
+

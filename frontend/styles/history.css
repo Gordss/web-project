@@ -1,13 +1,15 @@
 table caption {
     font-weight: bold;
     font-size: 1.5rem;
+    margin-top: 1.5rem;
     margin-bottom: 1.5rem;
+    margin-left: -5%;
 }
 
 table {
     width: 90%;
     margin-top: 1rem;
-    margin-left: 5%;
+    margin: auto;
     border-collapse: collapse;
 }
 
@@ -37,3 +39,25 @@ table tr:first-child td {
     padding-left: 10px;
     padding-right: 10px;
 }
+
+#table-navigation button {
+    padding:0.3em 1.2em;
+    margin:1.5em 0.1em 0.1em 0;
+    border:0.16em solid #f76725;
+    border-radius:2em;
+    box-sizing: border-box;
+    text-decoration:none;
+    color: black;
+    text-shadow: 0 0.04em 0.04em rgba(0,0,0,0.35);
+    text-align:center;
+    transition: all 0.2s;
+}
+
+#table-navigation button:hover {
+    border-color: rgba(255,255,255,1);
+}
+
+#table-navigation button:disabled {
+    border: none;
+}
+
