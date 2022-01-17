@@ -45,8 +45,9 @@
             $date = $convertion['CreateDate'];
             $name = $convertion['SourceName'].'.'.$convertion['SourceExtension'];
             $md5_sum = $convertion['Md5_Sum'];
+            $source_path = $convertion['SourcePath'];
 
-            array_push($response, ['id' => $id, 'name' => $name, 'md5-sum' => $md5_sum, 'create-date' => $date]);
+            array_push($response, ['id' => $id, 'name' => $name, 'md5-sum' => $md5_sum, 'create-date' => $date, 'source-path' => $source_path]);
         }
 
         http_response_code(200);

@@ -18,6 +18,20 @@ class Storage
         return self::$_instance;
     }
 
+    public function findFileSameMd5($location, $targetFileMd5) {
+        $fileSameMd5 = '';
+        $files = scandir($location);
+        foreach($files as $file) {
+            if($file != '.' && $file && $file != '..') {
+                if(md5_file($location.$file) == md5_file($targetFileMd5)) {
+                    $fileSameMd5 = $file;
+                }
+            }
+        }
+
+        return $fileSameMd5;
+    }
+
     public function insertConvertion($path, $tempFileName, $username, $options)
     {
         $location = './../files/';
@@ -29,13 +43,21 @@ class Storage
 
         $stmt = $this->conn->prepare('INSERT INTO Convertion (FK_User_Id, Options, SourcePath, SourceName, SourceExtension, Md5_Sum) VALUES (?, ?, ?, ?, ?, ?)');
         
-        $stmt->execute([$this->getUserIDByName($username), json_encode($options), $location, $fileWihtoutExt, $fileExtension, md5_file($path)]);
+        $fileSameMd5 = $this->findFileSameMd5($location, $path);
+
         $convertionId = $this->conn->lastInsertId();
 
-        $newPath = $location . $convertionId . '.' . $fileExtension;
-        // move archive to server storage
-        move_uploaded_file($path, $newPath);
-
+        if(!$fileSameMd5) {
+            $newPath = $location . $convertionId . '.' . $fileExtension;
+            // move archive to server storage
+            move_uploaded_file($path, $newPath);
+            $stmt->execute([$this->getUserIDByName($username), json_encode($options), $newPath, $fileWihtoutExt, $fileExtension, md5_file($newPath)]);
+        }
+        else {
+            $newPath = $location . $fileSameMd5;
+            $stmt->execute([$this->getUserIDByName($username), json_encode($options), $newPath, $fileWihtoutExt, $fileExtension, md5_file($newPath)]);
+        }
+        
         $convertion = new Convertion($tempFileName, $newPath);
 
         return $convertion;
@@ -55,7 +77,7 @@ class Storage
         $userId = $this->getUserIDByName($username);
 
         $sql = '
-        SELECT c.Id, c.CreateDate, c.Md5_Sum, c.SourceName, c.SourceExtension
+        SELECT c.Id, c.CreateDate, c.Md5_Sum, c.SourceName, c.SourceExtension, c.SourcePath
         FROM
             Convertion c
             JOIN user u on u.Id=c.Fk_User_Id
@@ -95,7 +117,7 @@ class Storage
         }
 
         $path = $result['SourcePath'] . $convertionId . '.' . $result['SourceExtension']; 
-        $convertion = new Convertion($result['SourceName'] . '.' . $result['SourceExtension'], $path);
+        $convertion = new Convertion($result['SourceName'] . '.' . $result['SourceExtension'], $result['SourcePath']);
 
         // convert options to json
         $options = json_decode($result['Options'], true);
@@ -129,21 +151,34 @@ class Storage
         return $result['Token'];
     }
 
-    public function deleteArchive($id): bool
+    public function deleteArchive($md5_sum): bool
     {
-        //delete from file explorer
-        $sql2 = 'SELECT SourceExtension FROM Convertion WHERE id = ?';
-        $stmt2 = $this->conn->prepare($sql2);
-        $stmt2->execute([$id]);
-        $result = $stmt2->fetch(PDO::FETCH_ASSOC);
-        $file_pointer = './../files/'. $id . '.' . $result['SourceExtension'];
-        unlink($file_pointer);
+        // check if more conversions exist for the same zip (md5 checksum)
+        $sql = 'SELECT COUNT(*) as Count FROM Convertion WHERE Md5_Sum = ?';
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$md5_sum]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        if(!$result['Count'])
+        {
+            return false;
+        }
+
+        if((int)$result['Count'] == 1) 
+        {
+            //delete from file explorer
+            $sql = 'SELECT SourcePath FROM Convertion WHERE Md5_Sum = ?';
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$md5_sum]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            unlink($result["SourcePath"]);
+        }
+        
         //delete from database
-        $sql = 'DELETE FROM Convertion WHERE id = ?';
+        $sql = 'DELETE FROM Convertion WHERE Md5_Sum = ?';
         $stmt = $this->conn->prepare($sql);
 
-        return $stmt->execute([$id]);
+        return $stmt->execute([$md5_sum]);
     }
 
     public function isUniqueEmail($email): bool

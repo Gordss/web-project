@@ -73,6 +73,7 @@ async function loadPage(pageNumber)
                 data.forEach(element => {
                     const td_id = document.createElement('td');
                     const archiveId = element['id'];
+                    const md5 = element['md5-sum'];
                     td_id.innerText = archiveId;
 
                     const td_name = document.createElement('td');
@@ -80,13 +81,14 @@ async function loadPage(pageNumber)
                     a_name.className = "archive-download-link";
                     a_name.innerText = element["name"];
                     const splitName = element["name"].split('.');
-                    const serveName = archiveId.concat('.' + splitName[splitName.length - 1]);
+                    serveName = element['source-path'];
+                    serveName = serveName.split('/').pop();
                     a_name.setAttribute('href', `./../../backend/files/${serveName}`);
                     a_name.setAttribute('download', element["name"]);
                     td_name.appendChild(a_name);
 
                     const td_md5Sum = document.createElement('td');
-                    td_md5Sum.innerText = element['md5-sum'];
+                    td_md5Sum.innerText = md5;
 
                     const td_createDate = document.createElement('td');
                     td_createDate.innerText = element['create-date'];
@@ -118,10 +120,11 @@ async function loadPage(pageNumber)
                     a_delete.className = "archive-delete-link";
                     a_delete.innerText = "Delete";
                     a_delete.style.cursor = 'pointer';
-
+                    
+                    // Here
                     a_delete.addEventListener('click', 
                         () => {
-                        fetch(`./../../backend/api/archive.php?id=${archiveId}`, {
+                        fetch(`./../../backend/api/archive.php?md5_sum=${md5}`, {
                             method: 'DELETE'
                         }).then(response => {
                             if (response.status === 204) {
