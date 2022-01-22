@@ -319,10 +319,8 @@ class Storage
         $token = bin2hex(random_bytes(50));
         try {
             $stmt = $this->conn->prepare('Update User SET Password = ?, Token = ? WHERE Email = ?');
-            $stmt->execute([$password, $token, $email]);
-            $result = $stmt->fetch();
-
-            return $result;
+            
+            return $stmt->execute([$password, $token, $email]);;
         } catch (PDOException $e) {
             Logger::log('Unable to change password: ' . $e->getMessage(),);
             return false;

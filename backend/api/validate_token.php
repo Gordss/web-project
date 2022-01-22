@@ -16,7 +16,7 @@
         sendResponse("Ok", FALSE, 200);
     }
     else {
-        sendResponse("Invalid token", TRUE, 401);
+        sendResponse("Not authorised!", TRUE, 401);
     }
 
 ?>

@@ -143,6 +143,9 @@ function uploadArchive(event) {
                 lineElement.style.color = colorFile(line, delimiter, typeIndex, fileColor);
                 resultPlaceholder.appendChild(lineElement);
             })
+
+            createCsvDownloadLink(text, zip['name']);
+            updateDownloadHTMLLink();
         });
     })
 }
@@ -169,7 +172,7 @@ function getUploadedFile() {
     return document.getElementById('file-input').files[0];
 }
 
-/*
+
 function createCsvDownloadLink(csvContent, zipName) {
     const fileName = zipName.substring(0, zipName.length - 3).concat("csv");
     document.getElementById("download-link-label").innerText = fileName;
@@ -191,7 +194,6 @@ function updateDownloadHTMLLink() {
     link.setAttribute('download', fileName);
     link.style.display = 'inline';
 }
-*/
 
 function terminateRequest(reason) {
     let resultPlaceholder = document.getElementById('csv-result-placeholder');

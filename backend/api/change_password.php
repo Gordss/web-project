@@ -19,15 +19,20 @@
 
     $userIsValid = Storage::getInstance()->verifyEmail($email);
     
-    if ($userIsValid) {
+    if(!$userIsValid)
+    {
+        sendResponse("An invalid email was entered", TRUE, 401);
+    }
 
-        $password = password_hash($password, PASSWORD_DEFAULT);
-        $PasswordChanged = Storage::getInstance()->changePassword($email, $password);
-        //$TokenChanged = Storage::getInstance()->changeToken($email) or in changePassword function;
+    $password = password_hash($password, PASSWORD_DEFAULT);
+    $PasswordChanged = Storage::getInstance()->changePassword($email, $password);
+
+    if($PasswordChanged)
+    {
         sendResponse("Ok", FALSE, 200);
     }
     else {
-        sendResponse("An invalid email was entered", TRUE, 401);
+        sendResponse("Error while changing password", TRUE, 401);
     }   
 
 ?>
