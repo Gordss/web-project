@@ -121,10 +121,9 @@ async function loadPage(pageNumber)
                     a_delete.innerText = "Delete";
                     a_delete.style.cursor = 'pointer';
                     
-                    // Here
                     a_delete.addEventListener('click', 
                         () => {
-                        fetch(`./../../backend/api/archive.php?md5_sum=${md5}`, {
+                        fetch(`./../../backend/api/archive.php?id=${archiveId}`, {
                             method: 'DELETE'
                         }).then(response => {
                             if (response.status === 204) {

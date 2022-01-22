@@ -30,14 +30,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') { // Gets a previously uploaded archiv
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') { // Deletes an archive from the DB
     $parsedQueryString = '';
     parse_str($_SERVER['QUERY_STRING'], $parsedQueryString);
-    if (!array_key_exists('md5_sum', $parsedQueryString) || empty($parsedQueryString['md5_sum'])) {
-        respondWithBadRequest('Missing md5 sum query parameter');
+    if (!array_key_exists('id', $parsedQueryString) || empty($parsedQueryString['id'])) {
+        respondWithBadRequest('Missing ID query parameter');
     }
-    $md5_sum = $parsedQueryString['md5_sum'];
+    $id = $parsedQueryString['id'];
 
-    $success = Storage::getInstance()->deleteArchive($md5_sum);
+    $success = Storage::getInstance()->deleteArchive($id);
     if (!$success) {
-        respondWithNotFound("Archive with md5 checksum $md5_sum not found");
+        respondWithNotFound("Archive with ID $id not found");
     }
     http_response_code(204);
     die;

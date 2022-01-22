@@ -19,7 +19,7 @@ class Storage
     }
 
     public function findFileSameMd5($location, $targetFileMd5) {
-        $fileSameMd5 = '';
+        $fileSameMd5 = false;
         $files = scandir($location);
         foreach($files as $file) {
             if($file != '.' && $file && $file != '..') {
@@ -42,21 +42,18 @@ class Storage
         $fileExtension = pathinfo($tempFileName)['extension'];
 
         $stmt = $this->conn->prepare('INSERT INTO Convertion (FK_User_Id, Options, SourcePath, SourceName, SourceExtension, Md5_Sum) VALUES (?, ?, ?, ?, ?, ?)');
-        
+
         $fileSameMd5 = $this->findFileSameMd5($location, $path);
 
-        $convertionId = $this->conn->lastInsertId();
-
         if(!$fileSameMd5) {
-            $newPath = $location . $convertionId . '.' . $fileExtension;
+            $newPath = $location . md5_file($path) . '.' . $fileExtension;
             // move archive to server storage
             move_uploaded_file($path, $newPath);
-            $stmt->execute([$this->getUserIDByName($username), json_encode($options), $newPath, $fileWihtoutExt, $fileExtension, md5_file($newPath)]);
         }
         else {
             $newPath = $location . $fileSameMd5;
-            $stmt->execute([$this->getUserIDByName($username), json_encode($options), $newPath, $fileWihtoutExt, $fileExtension, md5_file($newPath)]);
         }
+        $stmt->execute([$this->getUserIDByName($username), json_encode($options), $newPath, $fileWihtoutExt, $fileExtension, md5_file($newPath)]);
         
         $convertion = new Convertion($tempFileName, $newPath);
 
@@ -151,8 +148,19 @@ class Storage
         return $result['Token'];
     }
 
-    public function deleteArchive($md5_sum): bool
+    public function deleteArchive($id): bool
     {
+        $sql = 'SELECT Md5_sum FROM Convertion WHERE Id = ?';
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if(!$result['Md5_sum'])
+        {
+            return false;
+        }
+        $md5_sum = $result['Md5_sum'];
+
         // check if more conversions exist for the same zip (md5 checksum)
         $sql = 'SELECT COUNT(*) as Count FROM Convertion WHERE Md5_Sum = ?';
         $stmt = $this->conn->prepare($sql);
@@ -164,7 +172,7 @@ class Storage
             return false;
         }
 
-        if((int)$result['Count'] == 1) 
+        if((int)$result['Count'] === 1) 
         {
             //delete from file explorer
             $sql = 'SELECT SourcePath FROM Convertion WHERE Md5_Sum = ?';
@@ -175,10 +183,10 @@ class Storage
         }
         
         //delete from database
-        $sql = 'DELETE FROM Convertion WHERE Md5_Sum = ?';
+        $sql = 'DELETE FROM Convertion WHERE Id = ?';
         $stmt = $this->conn->prepare($sql);
 
-        return $stmt->execute([$md5_sum]);
+        return $stmt->execute([$id]);
     }
 
     public function isUniqueEmail($email): bool
