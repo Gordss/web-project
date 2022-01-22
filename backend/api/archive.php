@@ -12,14 +12,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') { // Gets a previously uploaded archiv
 
     $id = $_GET['id'];
 
-    // archive.php?id=???&options=true     | returns convertion's options
+    // archive.php?id=???&options=true     | returns conversion's options
     if (isset($_GET['options']) && $_GET['options'] == "true") {
         $options = Storage::getInstance()->getOptions($id);
         sendResponse($options, false, 200);
     }
 
     // archive.php?id=???  | return the archive only
-    $archiveCSV = Storage::getInstance()->getConvertionCSV($id);
+    $archiveCSV = Storage::getInstance()->getConversionCSV($id);
     if (!$archiveCSV) {
         respondWithNotFound("Archive with ID $id not found");
     }
@@ -70,12 +70,12 @@ verifyFileType();
 try {
     $storage = Storage::getInstance();
     $options = parseOptions();
-    $convertion = $storage->insertConvertion($_FILES["file"]["tmp_name"], $_FILES['file']['name'], $username, $options);
+    $conversion = $storage->insertConversion($_FILES["file"]["tmp_name"], $_FILES['file']['name'], $username, $options);
 
     $appliedOptionsJSON = json_encode($options);
     header("X-Applied-Options: $appliedOptionsJSON");
     //TODO: change to be with json_encode()
-    echo $convertion->toCSV($options);
+    echo $conversion->toCSV($options);
 } catch (Exception $e) {
     respondWithInternalServerError($e->getMessage());
 }

@@ -1,6 +1,6 @@
 <?php
 
-require "./../model/Convertion.php";
+require "./../model/Conversion.php";
 require "Logger.php";
 
 const DIRECTORY_TYPE = "directory";
@@ -32,7 +32,7 @@ class Storage
         return $fileSameMd5;
     }
 
-    public function insertConvertion($path, $tempFileName, $username, $options)
+    public function insertConversion($path, $tempFileName, $username, $options)
     {
         $location = './../files/';
         if ( !file_exists( $location ) && !is_dir( $location ) ) {
@@ -41,7 +41,7 @@ class Storage
         $fileWihtoutExt = pathinfo($tempFileName)['filename'];
         $fileExtension = pathinfo($tempFileName)['extension'];
 
-        $stmt = $this->conn->prepare('INSERT INTO Convertion (FK_User_Id, Options, SourcePath, SourceName, SourceExtension, Md5_Sum) VALUES (?, ?, ?, ?, ?, ?)');
+        $stmt = $this->conn->prepare('INSERT INTO Conversion (FK_User_Id, Options, SourcePath, SourceName, SourceExtension, Md5_Sum) VALUES (?, ?, ?, ?, ?, ?)');
 
         $fileSameMd5 = $this->findFileSameMd5($location, $path);
 
@@ -55,14 +55,14 @@ class Storage
         }
         $stmt->execute([$this->getUserIDByName($username), json_encode($options), $newPath, $fileWihtoutExt, $fileExtension, md5_file($newPath)]);
         
-        $convertion = new Convertion($tempFileName, $newPath);
+        $conversion = new Conversion($tempFileName, $newPath);
 
-        return $convertion;
+        return $conversion;
     }
 
-    public function getConvertionCountForUser($username): int
+    public function getConversionCountForUser($username): int
     {
-        $sql = 'SELECT COUNT(1) AS Count FROM Convertion c JOIN user u ON u.Id = c.Fk_User_Id WHERE u.Username = ?';
+        $sql = 'SELECT COUNT(1) AS Count FROM Conversion c JOIN user u ON u.Id = c.Fk_User_Id WHERE u.Username = ?';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$username]);
 
@@ -76,7 +76,7 @@ class Storage
         $sql = '
         SELECT c.Id, c.CreateDate, c.Md5_Sum, c.SourceName, c.SourceExtension, c.SourcePath
         FROM
-            Convertion c
+            Conversion c
             JOIN user u on u.Id=c.Fk_User_Id
         WHERE u.Id = :id
         ORDER BY c.Id DESC';
@@ -102,29 +102,29 @@ class Storage
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getConvertionCSV($convertionId): ?string
+    public function getConversionCSV($conversionId): ?string
     {
-        $sql = 'SELECT SourcePath, SourceName, SourceExtension, Options FROM Convertion WHERE Id = ?';
+        $sql = 'SELECT SourcePath, SourceName, SourceExtension, Options FROM Conversion WHERE Id = ?';
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$convertionId]);
+        $stmt->execute([$conversionId]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($result == false) {
             return null;
         }
 
-        $path = $result['SourcePath'] . $convertionId . '.' . $result['SourceExtension']; 
-        $convertion = new Convertion($result['SourceName'] . '.' . $result['SourceExtension'], $result['SourcePath']);
+        $path = $result['SourcePath'] . $conversionId . '.' . $result['SourceExtension']; 
+        $conversion = new Conversion($result['SourceName'] . '.' . $result['SourceExtension'], $result['SourcePath']);
 
         // convert options to json
         $options = json_decode($result['Options'], true);
 
-        return $convertion->toCSV($options);
+        return $conversion->toCSV($options);
     }
 
     public function getOptions($archiveID): ?string
     {
-        $sql = 'SELECT Options FROM Convertion WHERE id = ?';
+        $sql = 'SELECT Options FROM Conversion WHERE id = ?';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$archiveID]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -150,7 +150,7 @@ class Storage
 
     public function deleteArchive($id): bool
     {
-        $sql = 'SELECT Md5_sum FROM Convertion WHERE Id = ?';
+        $sql = 'SELECT Md5_sum FROM Conversion WHERE Id = ?';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$id]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -162,7 +162,7 @@ class Storage
         $md5_sum = $result['Md5_sum'];
 
         // check if more conversions exist for the same zip (md5 checksum)
-        $sql = 'SELECT COUNT(*) as Count FROM Convertion WHERE Md5_Sum = ?';
+        $sql = 'SELECT COUNT(*) as Count FROM Conversion WHERE Md5_Sum = ?';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$md5_sum]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -175,7 +175,7 @@ class Storage
         if((int)$result['Count'] === 1) 
         {
             //delete from file explorer
-            $sql = 'SELECT SourcePath FROM Convertion WHERE Md5_Sum = ?';
+            $sql = 'SELECT SourcePath FROM Conversion WHERE Md5_Sum = ?';
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([$md5_sum]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -183,7 +183,7 @@ class Storage
         }
         
         //delete from database
-        $sql = 'DELETE FROM Convertion WHERE Id = ?';
+        $sql = 'DELETE FROM Conversion WHERE Id = ?';
         $stmt = $this->conn->prepare($sql);
 
         return $stmt->execute([$id]);

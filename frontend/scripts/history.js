@@ -1,4 +1,4 @@
-const convertionsPerPage = 10;
+const conversionsPerPage = 10;
 let currentPage = 1;
 
 const historyTable = document.getElementById('history-table');
@@ -34,11 +34,11 @@ async function loadPage(pageNumber)
     const noRecordsLabel = document.getElementById('no-records-label');
     const historyTable = document.getElementById('history-table');
     const tableNavigationDiv = document.getElementById('table-navigation');
-    const totalConvertionsCount = await getConvertionsCount();
-    // check if any convertions exist
-    if (totalConvertionsCount == 0)
+    const totalConversionsCount = await getConversionsCount();
+    // check if any conversions exist
+    if (totalConversionsCount == 0)
     {
-        noRecordsLabel.innerText = 'There are no convertions!';
+        noRecordsLabel.innerText = 'There are no conversions!';
         historyTable.style.display = 'none';
         tableNavigationDiv.style.display = 'none';
         return;
@@ -59,12 +59,12 @@ async function loadPage(pageNumber)
 
     // page number validation
     if (pageNumber < 1) pageNumber = 1;
-    if (pageNumber > numPages(totalConvertionsCount)) pageNumber = numPages(totalConvertionsCount);
+    if (pageNumber > numPages(totalConversionsCount)) pageNumber = numPages(totalConversionsCount);
 
     currentPage.innerText = `Page: ${pageNumber}`;
-    const offset = (pageNumber - 1) * convertionsPerPage;
+    const offset = (pageNumber - 1) * conversionsPerPage;
 
-    fetch(`./../../backend/api/history.php?perpage=${convertionsPerPage}&offset=${offset}`)
+    fetch(`./../../backend/api/history.php?perpage=${conversionsPerPage}&offset=${offset}`)
         .then(res => res.json())
         .then(data => {
             
@@ -148,10 +148,10 @@ async function loadPage(pageNumber)
     
     // make buttons disabled if user is on first or last page
     btnPrev.disabled = pageNumber == 1;
-    btnNext.disabled = pageNumber == numPages(totalConvertionsCount);
+    btnNext.disabled = pageNumber == numPages(totalConversionsCount);
 }
 
-async function getConvertionsCount()
+async function getConversionsCount()
 {
     return fetch('./../../backend/api/history.php?count=true')
         .then(res => res.json())
@@ -178,18 +178,18 @@ function prevPage()
 
 function nextPage()
 {
-    getConvertionsCount()
-        .then(totalConvertionCount => {
-            if (currentPage < numPages(totalConvertionCount)) {
+    getConversionsCount()
+        .then(totalConversionCount => {
+            if (currentPage < numPages(totalConversionCount)) {
                 currentPage++;
                 loadPage(currentPage);
             }
         });
 }
 
-function numPages(totalConvertionCount)
+function numPages(totalConversionCount)
 {
-    return Math.ceil(totalConvertionCount / convertionsPerPage);
+    return Math.ceil(totalConversionCount / conversionsPerPage);
 }
 
 function loadGreetingHeader() {
