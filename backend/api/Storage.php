@@ -122,17 +122,30 @@ class Storage
         return $conversion->toCSV($options);
     }
 
-    public function getOptions($archiveID): ?string
+    public function getOptions($conversionId): ?string
     {
         $sql = 'SELECT Options FROM Conversion WHERE id = ?';
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$archiveID]);
+        $stmt->execute([$conversionId]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result == null) {
             return null;
         }
         return $result['Options'];
+    }
+
+    public function getSourceData($conversionId)
+    {
+        $sql = "SELECT CONCAT(Md5_Sum, '.', SourceExtension) AS ServerName, CONCAT(SourceName, '.', SourceExtension) AS OriginalName FROM Conversion WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$conversionId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($result == null) {
+            return null;
+        }
+        return $result;
     }
 
     public function getToken($email): ?string

@@ -30,11 +30,11 @@ table tr:first-child td {
     font-weight: bold;
 }
 
-.archive-download-link, .archive-csv-link, .archive-options-link {
+.action-link {
     color: orange;
 }
 
-.archive-delete-link {
+.action-delete-link {
     color: red;
     padding-left: 10px;
     padding-right: 10px;

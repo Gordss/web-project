@@ -18,6 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') { // Gets a previously uploaded archiv
         sendResponse($options, false, 200);
     }
 
+    // archive.php?id=???&servername=true     | returns conversion's servername, and filename
+    if (isset($_GET['servername']) && $_GET['servername'] == "true") {
+        $options = Storage::getInstance()->getSourceData($id);
+        sendResponse($options, false, 200);
+    }
+
     // archive.php?id=???  | return the archive only
     $archiveCSV = Storage::getInstance()->getConversionCSV($id);
     if (!$archiveCSV) {

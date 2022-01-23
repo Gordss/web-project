@@ -1,17 +1,57 @@
-var delimiter = ',', typeIndex = -1;
+let delimiter = ',', typeIndex = -1;
 const MAX_FILE_SIZE_BYTES = 524288000; // 500 MB
-const uploadForm = document.getElementById('upload-form');
-options = document.getElementById('options-input');
 
-loadGreetingHeader();
+window.onload = function ()
+{
+    loadGreetingHeader();
+    initializeOptions();
 
-//                     \/
-//  "input-data"  : "upload", "history", "url", "output"
-//  "input-config": "upload", "history", "url", "textarea"
-//                                                  /\
+    const uploadForm = document.getElementById('upload-form');
+    uploadForm.addEventListener('submit', processConversion);
 
+    const logoutA = document.getElementById('logout');
+    logoutA.addEventListener('click', (event) => {
+        fetch('./../../backend/api/logout.php')
+        .then(res => res.json())
+        .then(data => {
+            // TODO: add error handling when error is thrown on logging out  
+        });
+    });
+}
 
-options.innerHTML = `{
+function loadGreetingHeader() {
+    const greetingHeader = document.getElementById('greeting');
+
+    fetch('./../../backend/api/get_current_user.php')
+    .then(res => res.json())
+    .then(data => {
+        if (data.hasOwnProperty('logged') && data['logged'] == true && data.hasOwnProperty('username'))
+        {
+            greetingHeader.innerText += ` ${data['username']}`;
+        }
+        else
+        {
+            // TODO: add error handling when error is thrown to get username from server
+        }    
+    });
+}
+
+async function initializeOptions() {
+    const params = new URLSearchParams(window.location.search);
+    const loadedConversion = params.get('conversion');
+    const options = document.getElementById('options-input');
+
+    let oldOptionsJson = await fetchOptions(loadedConversion);
+    let optionsStr = null;
+
+    if (oldOptionsJson != null) {
+        oldOptionsJson["input-data"] = "history";
+        oldOptionsJson["input-config"] = "history";
+        oldOptionsJson = addNewOption(oldOptionsJson, "history-meta", loadedConversion, 2);
+        optionsStr = JSON.stringify(oldOptionsJson, null, '\t');
+    }
+
+    const defaultOptions = `{
 \t"input-data": "upload",
 \t"input-config": "textarea",
 \t"delimiter": ",",
@@ -30,10 +70,47 @@ options.innerHTML = `{
 \t}
 }`;
 
-options.addEventListener('keydown', (e) => {
+    options.innerHTML = optionsStr != null ? optionsStr : defaultOptions;
+
+    options.addEventListener('keydown', (e) => optionsKeyDownHandler(e, options));
+}
+
+function addNewOption(obj, key, value, index) {
+	// Create a temp object and index variable
+	var temp = {};
+	var i = 0;
+
+	// Loop through the original object
+	for (var prop in obj) {
+		if (obj.hasOwnProperty(prop)) {
+
+			// If the indexes match, add the new item
+			if (i === index && key && value) {
+				temp[key] = value;
+			}
+
+			// Add the current item in the loop to the temp obj
+			temp[prop] = obj[prop];
+
+			// Increase the count
+			i++;
+
+		}
+	}
+
+	// If no index, add to the end
+	if (!index && key && value) {
+		temp[key] = value;
+	}
+
+	return temp;
+}
+
+function optionsKeyDownHandler(e, options)
+{
     const beforeKey = options.selectionStart;
     const afterKey = options.selectionEnd;
-
+    
     if(e.key == 'Tab') {
         e.preventDefault();
         options.value = options.value.substring(0, beforeKey) + "\t" + options.value.substring(afterKey);
@@ -53,44 +130,28 @@ options.addEventListener('keydown', (e) => {
             options.selectionEnd = beforeKey;
         }
     }
-})
-
-uploadForm.addEventListener('submit', uploadArchive);
-
-const logoutA = document.getElementById('logout');
-logoutA.addEventListener('click', (event) => {
-    fetch('./../../backend/api/logout.php')
-    .then(res => res.json())
-    .then(data => {
-        // TODO: add error handling when error is thrown on logging out  
-    });
-});
-
-function loadGreetingHeader() {
-    const greetingHeader = document.getElementById('greeting');
-
-    fetch('./../../backend/api/get_current_user.php')
-    .then(res => res.json())
-    .then(data => {
-        if (data.hasOwnProperty('logged') && data['logged'] == true && data.hasOwnProperty('username'))
-        {
-            greetingHeader.innerText += ` ${data['username']}`;
-        }
-        else
-        {
-            // TODO: add error handling when error is thrown to get username from server
-        }    
-    });
 }
 
-function uploadArchive(event) {
+async function processConversion(event) {
 
     event.preventDefault();
     document.getElementById("download-csv").style.display = 'none';
 
-    var resultPlaceholder = document.getElementById('csv-result-placeholder');
+    const resultPlaceholder = document.getElementById('csv-result-placeholder');
+    const formData = new FormData(document.getElementById('upload-form'));
+    let optionsJson;
+    let requestedDelimiter;
 
-    let zip = getUploadedFile();
+    // validate if options are valid JSON
+    try {
+        optionsJson = JSON.parse(formData.get('options'));
+        requestedDelimiter = optionsJson?.delimiter ? optionsJson.delimiter : ',';
+    } catch (e) {
+        terminateRequest('The options for the conversion must be a valid JSON string');
+        return;
+    }
+
+    let zip = await getUploadedFile(optionsJson, isInputLoadedFromHistory(optionsJson));
     if (!zip) {
         terminateRequest('A file must be uploaded for conversion');
         return;
@@ -98,17 +159,6 @@ function uploadArchive(event) {
 
     if (zip.size > MAX_FILE_SIZE_BYTES) {
         terminateRequest(`The uploaded archive's size must not exceed ${MAX_FILE_SIZE_BYTES} bytes`);
-        return;
-    }
-
-    const formData = new FormData(document.getElementById('upload-form'));
-
-    var requestedDelimiter;
-    try {
-        const options = JSON.parse(formData.get('options'));
-        requestedDelimiter = options?.delimiter ? options.delimiter : ',';
-    } catch (e) {
-        terminateRequest('The options for the conversion must be a valid JSON string');
         return;
     }
 
@@ -176,10 +226,65 @@ function colorFile(line, delimiter, typeIndex, fileColor) {
     return defaultColor;
 }
 
-function getUploadedFile() {
-    return document.getElementById('file-input').files[0];
+function isInputLoadedFromHistory(json)
+{
+    return json.hasOwnProperty('input-data') &&
+        json['input-data'] === "history" &&
+        json.hasOwnProperty('input-config') &&
+        json['input-config'] === "history" &&
+        json.hasOwnProperty('history-meta');
 }
 
+async function fetchOptions(converionId)
+{
+    return converionId ? fetch(`./../../backend/api/archive.php?id=${converionId}&options=true`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.hasOwnProperty('success')) {
+                return JSON.parse(data['success']);
+            }
+            else {
+                return null;
+            }
+        }) : null;
+}
+
+async function getUploadedFile(json, isLoadedFileFromHistory) {
+
+    if (isLoadedFileFromHistory)
+    {
+        // { ServerName, OriginalName}
+        const fileData = await fetchSourceServerName(json['history-meta']);
+    
+        if (fileData == null ||
+            !fileData.hasOwnProperty('ServerName') ||
+            !fileData.hasOwnProperty('OriginalName'))
+        {
+            return null;
+        }
+
+        const { ServerName, OriginalName } = fileData;
+
+        return fetch(`./../../backend/files/${ServerName}`)
+            .then(res => res.blob())
+            .then(data => {
+                return new File([data], OriginalName, {type: data.type});
+            });
+    }
+    else
+    {
+        return document.getElementById('file-input').files[0];   
+    }
+}
+
+async function fetchSourceServerName(conversionId)
+{
+    return fetch(`./../../backend/api/archive.php?id=${conversionId}&servername=true`)
+        .then(res => res.json())
+        .then(data => {
+            return data.hasOwnProperty('success') ? data['success'] : null;
+        });
+}
 
 function createCsvDownloadLink(csvContent, zipName) {
     const fileName = zipName.substring(0, zipName.length - 3).concat("csv");

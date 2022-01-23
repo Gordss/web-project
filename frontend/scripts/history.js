@@ -1,32 +1,24 @@
 const conversionsPerPage = 10;
 let currentPage = 1;
 
-const historyTable = document.getElementById('history-table');
-
-loadGreetingHeader();
-
 window.onload = function ()
 {
+    loadGreetingHeader();
     loadPage(1);
     
     const btnPrev = document.getElementById('btn-prev');
     btnPrev.onclick = prevPage;
     const btnNext = document.getElementById('btn-next');
     btnNext.onclick = nextPage;
-}
 
-const logoutA = document.getElementById('logout');
-logoutA.addEventListener('click', () => {
-    fetch('./../../backend/api/logout.php')
-    .then(res => res.json())
-    .then(data => {
-        // TODO: add error handling when error is thrown on logging out  
+    const logoutA = document.getElementById('logout');
+    logoutA.addEventListener('click', () => {
+        fetch('./../../backend/api/logout.php')
+        .then(res => res.json())
+        .then(data => {
+            // TODO: add error handling when error is thrown on logging out  
+        });
     });
-});
-
-function initializeTable(table)
-{
-    
 }
 
 async function loadPage(pageNumber)
@@ -71,14 +63,12 @@ async function loadPage(pageNumber)
             if (!data.hasOwnProperty('error'))
             {
                 data.forEach(element => {
-                    const td_id = document.createElement('td');
                     const archiveId = element['id'];
                     const md5 = element['md5-sum'];
-                    td_id.innerText = archiveId;
 
                     const td_name = document.createElement('td');
                     const a_name = document.createElement('a');
-                    a_name.className = "archive-download-link";
+                    a_name.className = "action-link";
                     a_name.innerText = element["name"];
                     const splitName = element["name"].split('.');
                     serveName = element['source-path'];
@@ -96,8 +86,8 @@ async function loadPage(pageNumber)
                     const td_dowloadCSV = document.createElement('td');
                     td_dowloadCSV.className = "actions-td";
                     const a_downloadCSV = document.createElement('a');
-                    a_downloadCSV.className = "archive-csv-link";
-                    const initialTextCsv = "Load CSV";
+                    a_downloadCSV.className = "action-link";
+                    const initialTextCsv = "Convert";
                     a_downloadCSV.innerText = initialTextCsv;
                     a_downloadCSV.style.cursor = 'pointer';
 
@@ -107,17 +97,27 @@ async function loadPage(pageNumber)
                     const td_dowloadOptions = document.createElement('td');
                     td_dowloadOptions.className = "actions-td";
                     const a_downloadOptions = document.createElement('a');
-                    a_downloadOptions.className = "archive-options-link";
+                    a_downloadOptions.className = "action-link";
                     a_downloadOptions.innerText = "Download options";
 
                     a_downloadOptions.style.cursor = 'pointer';
                     a_downloadOptions.addEventListener('click', downloadOptions(a_downloadOptions, archiveId, splitName));
                     td_dowloadOptions.appendChild(a_downloadOptions);
 
+                    const td_loadInUpload = document.createElement('td');
+                    td_loadInUpload.className = "actions-td";
+                    const a_loadInUpload = document.createElement('a');
+                    a_loadInUpload.className = "action-link";
+                    a_loadInUpload.innerText = "Load";
+                    a_loadInUpload.title = "Loads the source file and options in the upload page.";
+                    a_loadInUpload.style.cursor = 'pointer';
+                    a_loadInUpload.addEventListener('click', () => redirectToUpload(archiveId));
+                    td_loadInUpload.appendChild(a_loadInUpload);
+
                     const td_delete = document.createElement('td');
                     td_delete.className = "actions-td";
                     const a_delete = document.createElement('a');
-                    a_delete.className = "archive-delete-link";
+                    a_delete.className = "action-delete-link";
                     a_delete.innerText = "Delete";
                     a_delete.style.cursor = 'pointer';
                     
@@ -134,12 +134,12 @@ async function loadPage(pageNumber)
                     td_delete.appendChild(a_delete);
 
                     const tr = document.createElement('tr');
-                    tr.appendChild(td_id);
                     tr.appendChild(td_name);
                     tr.appendChild(td_md5Sum);
                     tr.appendChild(td_createDate);
                     tr.appendChild(td_dowloadCSV);
                     tr.appendChild(td_dowloadOptions);
+                    tr.appendChild(td_loadInUpload);
                     tr.appendChild(td_delete);
                     historyTable.appendChild(tr);
                 });   
@@ -257,3 +257,6 @@ function downloadOptions(aTag, archiveId, splitName) {
     })
 }
 
+function redirectToUpload(conversionId) {
+    location.replace(`./../pages/upload_page.html?conversion=${conversionId}`);
+}
