@@ -67,6 +67,10 @@ async function initializeOptions() {
 \t\t"text": "rgb(0, 0, 0)",
 \t\t"image": "rgb(0, 0, 0)",
 \t\t"directory": "rgb(0, 0, 0)"
+\t}, 
+\t"regex-color" : {
+\t\t"regex" : "[A-Z]", 
+\t\t"color" : "rgb(0, 0, 0)"    
 \t}
 }`;
 
@@ -189,6 +193,7 @@ async function processConversion(event) {
 
             const options = JSON.parse(response.headers.get('X-Applied-Options'));
             const fileColor = options['file-type-color'];
+            const regexColor = options['regex-color'];
 
             delimiter = options.delimiter ? options.delimiter : ',';
             typeIndex = options['included-fields'] ? options['included-fields'].indexOf('type') : -1;
@@ -197,7 +202,22 @@ async function processConversion(event) {
             lines.pop(); // There is an empty line in the end
             lines.forEach(line => {
                 const lineElement = document.createElement('div');
-                lineElement.innerHTML = line;
+                var match = line.match(regexColor['regex']);
+                var splitStr = line.split(match);
+                if(match)
+                {
+                    var coloredText = "<span style='color:" + regexColor['color'] + "'>" + match + "</span>";
+                    var result = splitStr[0];
+                    for(let i = 1; i < splitStr.length; i++)
+                    {
+                        result += coloredText + splitStr[i];
+                    }
+                    lineElement.innerHTML = result;
+                }
+                else
+                {
+                    lineElement.innerHTML = line;
+                }
                 lineElement.style.color = colorFile(line, delimiter, typeIndex, fileColor);
                 resultPlaceholder.appendChild(lineElement);
             })

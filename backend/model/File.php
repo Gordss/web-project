@@ -25,6 +25,9 @@ class File
     private $imageFileColor = null;
     private $directoryColor = null;
 
+    private $Regex = null;
+    private $RegexFileColor = null;
+
     public function __construct($name, $parent_name, $content_length, $type, $md5_sum)
     {
         $this->name = $name;
@@ -82,6 +85,14 @@ class File
         $this->directoryColor = $value;
     }
 
+    public function setRegex($value) {
+        $this->Regex = $value;
+    }    
+
+    public function setRegexColor($value) {
+        $this->RegexColor = $value;
+    }
+    
     public function getFields($includedFields = array('name', 'parent-name', 'content-length', 'type', 'md5-sum')): array
     {
         $fields = array();

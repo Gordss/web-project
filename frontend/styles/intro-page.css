@@ -37,7 +37,7 @@ h1 {
 }
 
 .credentials-form input {
-    color: orange;
+    color: rgb(228, 150, 108);
     font-weight: bold;
     margin-bottom: 8px;
     border-color:white;
@@ -51,7 +51,7 @@ h1 {
 
 .credentials-section p a {
     font-weight: bold;
-    color: orange;
+    color: rgb(228, 150, 108);
 }
 
 .bottom-text {

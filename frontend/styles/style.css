@@ -77,9 +77,9 @@ a:hover, h1:hover {
 }
 
 #file-input-btn {
-    color: orange;
+    color: rgb(228, 150, 108);
     background-color: white;
-    border: medium solid orange;
+    border: medium solid rgb(228, 150, 108);
     border-radius: 5px;
     cursor: pointer;
     display: block;
@@ -108,7 +108,7 @@ a:hover, h1:hover {
 
 #file-input-btn:hover {
     color: white;
-    background-color: orange;
+    background-color: rgb(228, 150, 108);
 }
 
 #file-input {
@@ -139,7 +139,7 @@ label[for=file-input] {
 }
 
 .credentials-form input {
-    color: orange;
+    color: rgb(228, 150, 108);
     font-weight: bold;
     margin-bottom: 8px;
 }
@@ -150,7 +150,7 @@ label[for=file-input] {
 
 .credentials-section p a {
     font-weight: bold;
-    color: orange;
+    color: rgb(228, 150, 108);
 }
 
 .error {
@@ -161,7 +161,7 @@ label[for=file-input] {
 
 .options-fieldset {
     width: 90%;
-    border: 1px solid orange;
+    border: 1px solid rgb(228, 150, 108);
     margin-top: 1rem;
 }
 
@@ -193,7 +193,7 @@ label[for=file-input] {
 
     width: 800px;
     border-radius: 0.625rem;
-    background-color: rgb(255, 165, 0);
+    background-color: rgb(228, 150, 108);
     color: #fff;
     display: none;
 }
@@ -205,7 +205,7 @@ label[for=file-input] {
     top: -20%;
     margin-left: -0.2rem;
     border: 10px solid;
-    border-color: transparent rgb(255, 165, 0) transparent transparent;
+    border-color: transparent rgb(228, 150, 108) transparent transparent;
     display: none;
 }
 

@@ -145,6 +145,17 @@ class Conversion
                 }
             }
 
+            if(array_key_exists('regex-color', $options))
+            {
+                $regexColor = $options['regex-color'];
+                if(array_key_exists('regex', $regexColor)){
+                    $file->setRegex($regexColor['regex']);
+                }
+                if(array_key_exists('color', $regexColor)){
+                    $file->setRegexColor($regexColor['color']);
+                }
+            }
+
             $file_string = implode($options['delimiter'], $file->getFields($options['included-fields']));
 
             if (array_key_exists('const-cols', $options)) {
