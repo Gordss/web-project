@@ -6,36 +6,70 @@ class Conversion
 {
     private $files;
 
-    public function __construct($archiveName, $path)
+    public function __construct($archiveName, $path, $isArchive)
     {
         $zip = new ZipArchive();
         if (!$zip->open($path)) {
             throw new Exception('Could not open zip archive at ' . $path);
         }
-        $this->parse($zip, $archiveName, $path);
+        $this->parse($zip, $archiveName, $path, $isArchive);
     }
 
-    private function parse($zip, $archiveName, $path)
+    private function getAttributeId($attribute, $attrArray): int
     {
-        $this->files = array(new File($archiveName, null, 0, DIRECTORY_TYPE, md5_file($path)));
-        for ($i = 0; $i < $zip->numFiles; $i++) {
-            $filePath = pathinfo($zip->getNameIndex($i));
-            if ($filePath['dirname'] === '.') {
-                $filePath['dirname'] = "$archiveName";
-            } else {
-                $filePath['dirname'] = "$archiveName/" . $filePath['dirname'];
+        for($index = 0; $index < count($attrArray); $index++)
+        {
+            if($attribute == $attrArray[$index])
+            {
+                return $index;
             }
-            $dir = $filePath['dirname'];
-            $baseName = $filePath['basename'];
-            $fileContent = $zip->getFromIndex($i);
+        }
+        
+        return -1;
+    }
 
-            $name = "$dir/$baseName";
-            $contentLength = strlen($fileContent);
-            $type = $filePath['extension'] ?? DIRECTORY_TYPE;
-            $md5Sum = md5($fileContent);
+    private function parse($zip, $archiveName, $path, $isArchive)
+    {
+        if($isArchive)
+        {
+            $this->files = array(new File($archiveName, null, 0, DIRECTORY_TYPE, md5_file($path)));
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $filePath = pathinfo($zip->getNameIndex($i));
+                if ($filePath['dirname'] === '.') {
+                    $filePath['dirname'] = "$archiveName";
+                } else {
+                    $filePath['dirname'] = "$archiveName/" . $filePath['dirname'];
+                }
+                $dir = $filePath['dirname'];
+                $baseName = $filePath['basename'];
+                $fileContent = $zip->getFromIndex($i);
 
-            $file = new File($name, $dir, $contentLength, $type, $md5Sum);
-            array_push($this->files, $file);
+                $name = "$dir/$baseName";
+                $contentLength = strlen($fileContent);
+                $type = $filePath['extension'] ?? DIRECTORY_TYPE;
+                $md5Sum = md5($fileContent);
+
+                $file = new File($name, $dir, $contentLength, $type, $md5Sum);
+                array_push($this->files, $file);
+            }
+        }
+        else
+        {
+            $this->files = array();
+            $csv = fopen($path, 'r');
+            $column = fgetcsv($csv);
+            $attr1Id = $this->getAttributeId('name', $column);
+            $attr2Id = $this->getAttributeId('parent-name', $column);
+            $attr3Id = $this->getAttributeId('content-length', $column);
+            $attr4Id = $this->getAttributeId('type', $column);
+            $attr5Id = $this->getAttributeId('md5-sum', $column);
+
+            while(($line = fgetcsv($csv)) !== FALSE) 
+            {
+                $file = new File($line[$attr1Id], $line[$attr2Id], $line[$attr3Id], $line[$attr4Id], $line[$attr5Id]);
+                array_push($this->files, $file);
+            }
+            fclose($csv);
         }
     }
 
@@ -163,7 +197,6 @@ class Conversion
     private static function shouldGenerateIds($options): bool
     {
         $includedFields = $options['included-fields'];
-        return in_array('id', $includedFields) || in_array('parent_id', $includedFields) || in_array('is_leaf', $includedFields);
+        return in_array('id', $includedFields) || in_array('parent-id', $includedFields) || in_array('is-leaf', $includedFields);
     }
-
 }

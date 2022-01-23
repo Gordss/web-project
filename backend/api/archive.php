@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') { // Gets a previously uploaded archiv
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') { // Deletes an archive from the DB
     $parsedQueryString = '';
     parse_str($_SERVER['QUERY_STRING'], $parsedQueryString);
-    if (!array_key_exists('id', $parsedQueryString) || empty($parsedQueryString['id'])) {
+    if (!array_key_exists('id', (array)$parsedQueryString) || empty($parsedQueryString['id'])) {
         respondWithBadRequest('Missing ID query parameter');
     }
     $id = $parsedQueryString['id'];
@@ -47,7 +47,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') { // Deletes an archive from the DB
 // POST request is handled here
 
 const DEFAULT_OPTIONS = array(
-    'included-fields' => array('id', 'parent_id','name', 'parent-name', 'content-length', 'type', 'md5_sum','is_leaf', 'css', 'url'),
+    'input-data' => 'upload',
+    'input-config' => 'textarea',
+    'included-fields' => array('id', 'parent-id','name', 'parent-name', 'content-length', 'type', 'md5-sum','is-leaf', 'css', 'url'),
     'include-header' => true,
     'uppercase' => false,
     'delimiter' => ',',
@@ -66,12 +68,19 @@ if ($_FILES['file']['size'] > MAX_FILE_BYTES_SIZE) {
     respondWithBadRequest("The size of the uploaded archive must not exceed " . MAX_FILE_BYTES_SIZE . ' bytes.');
 }
 
-verifyFileType();
 try {
     $storage = Storage::getInstance();
     $options = parseOptions();
-    $conversion = $storage->insertConversion($_FILES["file"]["tmp_name"], $_FILES['file']['name'], $username, $options);
-
+    if(verifyIsArchive($_FILES["file"]["type"])) {
+        $conversion = $storage->insertConversion($_FILES['file']['tmp_name'], $_FILES['file']['name'], $username, $options, true);
+    }
+    else if(verifyIsCSV($_FILES["file"]["type"])) {
+        $conversion = $storage->insertConversion($_FILES['file']['tmp_name'], $_FILES['file']['name'], $username, $options, false);
+    }
+    else {
+        respondWithBadRequest('The uploaded file is not a zip archive or comma separated file');
+    }
+    
     $appliedOptionsJSON = json_encode($options);
     header("X-Applied-Options: $appliedOptionsJSON");
     //TODO: change to be with json_encode()
@@ -80,15 +89,26 @@ try {
     respondWithInternalServerError($e->getMessage());
 }
 
-function verifyFileType()
-{
+function verifyIsArchive($fileType): bool {
     $accepted_types = array('application/zip', 'application/x-zip-compressed', 'multipart/x-zip', 'application/x-compressed');
     foreach ($accepted_types as $mime_type) {
-        if ($mime_type == $_FILES["file"]["type"]) {
-            return;
+        if ($mime_type == $fileType) {
+            return true;
         }
     }
-    respondWithBadRequest('The uploaded file is not a zip archive');
+
+    return false;
+}
+
+function verifyIsCSV($fileType): bool {
+    $accepted_types = array('application/vnd.ms-excel', 'text/csv', 'text/x-csv', 'application/csv', 'application/x-csv', 'text/comma-separated-values', 'text/x-comma-separated-values');
+    foreach ($accepted_types as $mime_type) {
+        if ($mime_type == $fileType) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function authenticateUser()
@@ -121,8 +141,8 @@ function parseOptions(): array
             respondWithBadRequest('Chosen conversion options are invalid. If "url" field is added the following options must be defined: "url-prefix", "url-suffix", "url-field-urlencoded."');
         }
 
-        if (!in_array($options['url-field-urlencoded'], array('id', 'name', 'content-length', 'md5_sum'))) {
-            respondWithBadRequest('Chosen conversion options are invalid. Value of "url-field-urlencoded" must be one of the following fields: "id", "name", "content-length", "md5_sum".');
+        if (!in_array($options['url-field-urlencoded'], array('id', 'name', 'content-length', 'md5-sum'))) {
+            respondWithBadRequest('Chosen conversion options are invalid. Value of "url-field-urlencoded" must be one of the following fields: "id", "name", "content-length", "md5-sum".');
         }
 
         checkKeyForDelimiter('url-prefix', $options, $options['delimiter']);
@@ -151,8 +171,8 @@ function parseOptions(): array
     }
 
     //you cannot choose to include parent_id field without including is field
-    if (!in_array('id', $includedFields) && in_array('parent_id', $includedFields)) {
-        respondWithBadRequest('Chosen conversion options are invalid. Field "parent_id" can only be included if field "id" is included.');
+    if (!in_array('id', $includedFields) && in_array('parent-id', $includedFields)) {
+        respondWithBadRequest('Chosen conversion options are invalid. Field "parent-id" can only be included if field "id" is included.');
     }
 
     //verify css values do not contain chosen delimiter

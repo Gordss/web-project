@@ -5,9 +5,17 @@ options = document.getElementById('options-input');
 
 loadGreetingHeader();
 
+//                     \/
+//  "input-data"  : "upload", "history", "url", "output"
+//  "input-config": "upload", "history", "url", "textarea"
+//                                                  /\
+
+
 options.innerHTML = `{
+\t"input-data": "upload",
+\t"input-config": "textarea",
 \t"delimiter": ",",
-\t"included-fields": ["id","parent_id","name","type","parent-name","content-length","md5_sum","is_leaf", "css", "url"],
+\t"included-fields": ["id","parent-id","name","type","parent-name","content-length","md5-sum","is-leaf", "css", "url"],
 \t"include-header": true,
 \t"skip-zip-filename": false,
 \t"uppercase": false,

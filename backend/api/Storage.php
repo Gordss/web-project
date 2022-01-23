@@ -32,7 +32,7 @@ class Storage
         return $fileSameMd5;
     }
 
-    public function insertConversion($path, $tempFileName, $username, $options)
+    public function insertConversion($path, $tempFileName, $username, $options, $isArchive)
     {
         $location = './../files/';
         if ( !file_exists( $location ) && !is_dir( $location ) ) {
@@ -55,7 +55,7 @@ class Storage
         }
         $stmt->execute([$this->getUserIDByName($username), json_encode($options), $newPath, $fileWihtoutExt, $fileExtension, md5_file($newPath)]);
         
-        $conversion = new Conversion($tempFileName, $newPath);
+        $conversion = new Conversion($tempFileName, $newPath, $isArchive);
 
         return $conversion;
     }
@@ -114,7 +114,7 @@ class Storage
         }
 
         $path = $result['SourcePath'] . $conversionId . '.' . $result['SourceExtension']; 
-        $conversion = new Conversion($result['SourceName'] . '.' . $result['SourceExtension'], $result['SourcePath']);
+        $conversion = new Conversion($result['SourceName'] . '.' . $result['SourceExtension'], $result['SourcePath'], $result['SourceExtension'] == 'zip');
 
         // convert options to json
         $options = json_decode($result['Options'], true);

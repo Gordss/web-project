@@ -82,7 +82,7 @@ class File
         $this->directoryColor = $value;
     }
 
-    public function getFields($includedFields = array('name', 'parent-name', 'content-length', 'type', 'md5_sum')): array
+    public function getFields($includedFields = array('name', 'parent-name', 'content-length', 'type', 'md5-sum')): array
     {
         $fields = array();
         foreach ($includedFields as $fieldName) {
@@ -90,7 +90,7 @@ class File
                 case 'id':
                     array_push($fields, $this->id);
                     break;
-                case 'parent_id':
+                case 'parent-id':
                     array_push($fields, $this->parent_id);
                     break;
                 case 'name':
@@ -105,10 +105,10 @@ class File
                 case 'type':
                     array_push($fields, $this->type);
                     break;
-                case 'md5_sum':
+                case 'md5-sum':
                     array_push($fields, $this->md5_sum);
                     break;
-                case 'is_leaf':
+                case 'is-leaf':
                     array_push($fields, self::constructIsLeafValue($this->isLeafNumeric));
                     break;
                 case 'css':
@@ -171,7 +171,7 @@ class File
             case 'content-length':
                 $url = $url . $this->content_length;
                 break;
-            case 'md5_sum':
+            case 'md5-sum':
                 $url = $url . $this->md5_sum;
                 break;
             default:
