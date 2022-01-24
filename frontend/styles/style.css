@@ -77,9 +77,9 @@ a:hover, h1:hover {
 }
 
 #file-input-btn {
-    color: rgb(228, 150, 108);
+    color: orange;
     background-color: white;
-    border: medium solid rgb(228, 150, 108);
+    border: medium solid orange;
     border-radius: 5px;
     cursor: pointer;
     display: block;
@@ -108,7 +108,7 @@ a:hover, h1:hover {
 
 #file-input-btn:hover {
     color: white;
-    background-color: rgb(228, 150, 108);
+    background-color: orange;
 }
 
 #file-input {
@@ -136,21 +136,6 @@ label[for=file-input] {
     margin-left: auto;
     margin-right: auto;
     margin-top: 20%;
-}
-
-.credentials-form input {
-    color: rgb(228, 150, 108);
-    font-weight: bold;
-    margin-bottom: 8px;
-}
-
-.credentials-section p {
-    text-align: center;
-}
-
-.credentials-section p a {
-    font-weight: bold;
-    color: rgb(228, 150, 108);
 }
 
 .error {

@@ -69,8 +69,8 @@ async function initializeOptions() {
 \t\t"directory": "rgb(0, 0, 0)"
 \t}, 
 \t"regex-color" : {
-\t\t"regex" : "[A-Z]", 
-\t\t"color" : "rgb(0, 0, 0)"    
+\t\t"regex" : ".zip", 
+\t\t"color" : "rgb(0, 0, 0)"
 \t}
 }`;
 
@@ -114,7 +114,7 @@ function optionsKeyDownHandler(e, options)
 {
     const beforeKey = options.selectionStart;
     const afterKey = options.selectionEnd;
-    
+
     if(e.key == 'Tab') {
         e.preventDefault();
         options.value = options.value.substring(0, beforeKey) + "\t" + options.value.substring(afterKey);
