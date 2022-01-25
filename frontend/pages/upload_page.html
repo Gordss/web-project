@@ -37,15 +37,20 @@
                         <span
                                 class="tooltip"
                                 data-title="A JSON string for configuring options for the zip->CSV conversion"
-                                data-delimiter="    &quot;delimiter&quot; (string) - will be used to separate the data on each row."
-                                data-fields="    &quot;included-fields&quot; - (array of strings) - what file properties to include in the result CSV. Possible values are: &quot;id&quot;, &quot;parent-id&quot;, &quot;name&quot;, &quot;type&quot;, &quot;parent-type&quot;, &quot;content-length&quot;, &quot;md5-sum&quot;, &quot;is-leaf&quot;, &quot;css&quot;."
-                                data-header="    &quot;included-header&quot; (boolean) - whether to include a header line in result CSV"
-                                data-uppercase="    &quot;uppercase&quot; - (boolean) - whether to convert the result CSV to uppercase."
-                                data-is-leaf="    &quot;is-leaf-numeric&quot; - (boolean) - whether to use 0/1 instead of false/true for the &quot;is-leaf&quot; field value"
-                                data-zip-name="    &quot;skip-zip-filename&quot; - (boolean) - whether to skip the zip filename in the files' names"
-                                data-css="    &quot;css-directory&quot; / &quot;css-text-file&quot; / &quot;css-image-file&quot; / &quot;css-default&quot; - (string) - value of the &quot;css&quot; column for the corresponding file type"
-                                data-url="    &quot;url-prefix&quot; + &quot;url-suffix&quot; + &quot;url-field-urlencoded&quot; = &quot;url&quot; - (string values) - this is how the &quot;url&quot; column is constructed. &quot;url-field-urlencoded&quot; is one of the included fields."
-                                data-cols="    &quot;const-cols&quot; - (array of strings) - empty columns to attach to result CSV">
+                                data-input-data="   ○ &quot;input-data&quot; (string) - where the file is loaded from"
+                                data-input-config="   ○ &quot;input-config&quot; (string) - where the options are loaded from"
+                                data-history-meta="   ○ &quot;history-meta&quot; (string) - conversion id loaded from history"
+                                data-delimiter="   ○ &quot;delimiter&quot; (string) - will be used to separate the data on each row"
+                                data-fields="   ○ &quot;included-fields&quot; - (array of strings) - what file properties to include in the result CSV. Possible values are: &quot;id&quot;, &quot;parent-id&quot;, &quot;name&quot;, &quot;type&quot;, &quot;parent-type&quot;, &quot;content-length&quot;, &quot;md5-sum&quot;, &quot;is-leaf&quot;, &quot;css&quot;"
+                                data-header="   ○ &quot;included-header&quot; (boolean) - whether to include a header line in result CSV"
+                                data-uppercase="   ○ &quot;uppercase&quot; - (boolean) - whether to convert the result CSV to uppercase"
+                                data-is-leaf="   ○ &quot;is-leaf-numeric&quot; - (boolean) - whether to use 0/1 instead of false/true for the &quot;is-leaf&quot; field value"
+                                data-zip-name="   ○ &quot;skip-zip-filename&quot; - (boolean) - whether to skip the zip filename in the files' names"
+                                data-css="   ○ &quot;css-directory&quot; / &quot;css-text-file&quot; / &quot;css-image-file&quot; / &quot;css-default&quot; - (string) - value of the &quot;css&quot; column for the corresponding file type"
+                                data-url="   ○ &quot;url-prefix&quot; + &quot;url-suffix&quot; + &quot;url-field-urlencoded&quot; = &quot;url&quot; - (string values) - this is how the &quot;url&quot; column is constructed. &quot;url-field-urlencoded&quot; is one of the included fields"
+                                data-cols="   ○ &quot;const-cols&quot; - (array of strings) - empty columns to attach to result CSV"
+                                data-file-type-color="   ○ &quot;file-type-color&quot; (object) - color txt/image/directory files"
+                                data-regex-color="   ○ &quot;regex-color&quot; (object) - color regex matching test">
                             <img alt="info icon" id="info_icon" src="./../images/info_btn.png"/>
                         </span>
                         <a id="options_info"></a>
