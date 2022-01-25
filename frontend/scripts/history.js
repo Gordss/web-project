@@ -16,7 +16,10 @@ window.onload = function ()
         fetch('./../../backend/api/logout.php')
         .then(res => res.json())
         .then(data => {
-            // TODO: add error handling when error is thrown on logging out  
+            if (data.hasOwnProperty('error'))
+            {
+                location.replace("./../pages/server_error_page.html");
+            }
         });
     });
 }
@@ -160,10 +163,10 @@ async function getConversionsCount()
             {
                 return +data['success'];
             }
-            else {
-                // TODO: add error handling
-                return 0;
-            }
+            else if (data.hasOwnProperty('error'))
+            {
+                location.replace("./../pages/server_error_page.html");
+            }  
         });
 }
 
@@ -203,10 +206,10 @@ function loadGreetingHeader() {
             const username = data['username'];
             greetingHeader.innerText += ` ${username}`;
         }
-        else
+        else if (data.hasOwnProperty('error'))
         {
-            // TODO: add error handling when error is thrown to get username from server
-        }    
+            location.replace("./../pages/server_error_page.html");
+        }   
     });
 }
 

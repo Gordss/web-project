@@ -14,7 +14,10 @@ window.onload = function ()
         fetch('./../../backend/api/logout.php')
         .then(res => res.json())
         .then(data => {
-            // TODO: add error handling when error is thrown on logging out  
+            if (data.hasOwnProperty('error'))
+            {
+                location.replace("./../pages/server_error_page.html");
+            }
         });
     });
 }
@@ -29,10 +32,10 @@ function loadGreetingHeader() {
         {
             greetingHeader.innerText += ` ${data['username']}`;
         }
-        else
+        else if (data.hasOwnProperty('error'))
         {
-            // TODO: add error handling when error is thrown to get username from server
-        }    
+            location.replace("./../pages/server_error_page.html");
+        }   
     });
 }
 
@@ -74,7 +77,18 @@ async function initializeOptions() {
 \t"input-data": "upload",
 \t"input-config": "textarea",
 \t"delimiter": ",",
-\t"included-fields": ["id","parent-id","name","type","parent-name","content-length","md5-sum","is-leaf", "css", "url"],
+\t"included-fields": [
+\t\t"id",
+\t\t"parent-id",
+\t\t"name",
+\t\t"type",
+\t\t"parent-name",
+\t\t"content-length",
+\t\t"md5-sum",
+\t\t"is-leaf",
+\t\t"css",
+\t\t"url"
+\t],
 \t"include-header": true,
 \t"skip-zip-filename": false,
 \t"uppercase": false,
@@ -88,7 +102,7 @@ async function initializeOptions() {
 \t\t"directory": "rgb(0, 0, 0)"
 \t}, 
 \t"regex-color" : {
-\t\t"regex" : ".zip", 
+\t\t"regex" : "", 
 \t\t"color" : "rgb(0, 0, 0)"
 \t}
 }`;
@@ -175,9 +189,8 @@ function processConversion(event) {
 
     // let zip = await getUploadedFile(optionsJson, isInputLoadedFromHistory(optionsJson));
 
-    let zip;
+  
     if (optionsJson['input-data'] == 'upload') {
-        zip = document.getElementById('file-input').files[0];
         formData.append('file', document.getElementById('file-input').files[0]);
     }
 
@@ -243,10 +256,14 @@ function processConversion(event) {
                 }
                 lineElement.style.color = colorFile(line, delimiter, typeIndex, fileColor);
                 resultPlaceholder.appendChild(lineElement);
-            })
 
-            createCsvDownloadLink(text, zip['name']);
+                
+            });
+
+            const filename = JSON.parse(response.headers.get('File-name'));
+            createCsvDownloadLink(text, filename);
             updateDownloadHTMLLink();
+
         });
     })
 }
@@ -290,10 +307,8 @@ async function fetchOptions(converionId)
         }) : null;
 }
 
-function createCsvDownloadLink(csvContent, zipName) {
-    const fileName = zipName.substring(0, zipName.length - 3).concat("csv");
+function createCsvDownloadLink(csvContent, fileName) {
     document.getElementById("download-link-label").innerText = fileName;
-
     let link = document.getElementById("download-csv");
     link.setAttribute("href", 'data:text/csv;charset=utf-8,' + encodeURI(csvContent));
     link.setAttribute("download", fileName);

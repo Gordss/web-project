@@ -90,7 +90,7 @@ try {
             break;
         case 'history':
             $fileMeta = Storage::getInstance()->getSourceData($options['history-meta']);
-            $filename = $fileMeta["ServerName"];
+            $filename = $fileMeta["OriginalName"]; 
             $filenameTmp = $fileMeta["SourcePath"];
             $filetype = mime_content_type($filenameTmp);
             break;
@@ -133,6 +133,8 @@ try {
     
     $appliedOptionsJSON = json_encode($options);
     header("X-Applied-Options: $appliedOptionsJSON");
+    $encodedFilename = json_encode($filename);
+    header("File-name: $encodedFilename");
     //TODO: change to be with json_encode()
     echo $conversion->toCSV($options);
 } catch (Exception $e) {
