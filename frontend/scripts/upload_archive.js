@@ -295,12 +295,14 @@ async function fetchOptions(converionId)
 }
 
 function createCsvDownloadLink(csvContent, fileName) {
-    document.getElementById("download-link-label").innerText = fileName;
+    const csvFileName = fileName.substring(0, fileName.length - 3).concat("csv");
+    document.getElementById("download-link-label").innerText = csvFileName;
     let link = document.getElementById("download-csv");
     link.setAttribute("href", 'data:text/csv;charset=utf-8,' + encodeURI(csvContent));
-    link.setAttribute("download", fileName);
+    link.setAttribute("download", csvFileName);
     link.style.display = "inline";
 }
+
 
 function updateDownloadHTMLLink() {
     const zipName = document.getElementById('download-csv').innerText;
