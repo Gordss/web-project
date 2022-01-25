@@ -1,11 +1,12 @@
 <?php
 
+require_once "./config.php";
 require "./Storage.php";
 require "./../utils/send_response.php";
 
 $username = authenticateUser();
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET') { // Gets a previously uploaded archive's CSV representation
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (!isset($_GET['id'])) {
         respondWithBadRequest('Missing ID query parameter');
     }
@@ -52,27 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') { // Deletes an archive from the DB
 // Otherwise, upload an archive and return its CSV representation
 // POST request is handled here
 
-const DEFAULT_OPTIONS = array(
-    'input-data' => 'upload',
-    'input-config' => 'textarea',
-    'included-fields' => array('id', 'parent-id','name', 'parent-name', 'content-length', 'type', 'md5-sum','is-leaf', 'css', 'url'),
-    'include-header' => true,
-    'uppercase' => false,
-    'delimiter' => ',',
-    'is-leaf-numeric' => false,
-    'url-prefix' => 'http://localhost/download.php?file=',
-    'url-suffix' => '&force_download=true',
-    'url-field-urlencoded' => 'id'
-);
+
 const MAX_FILE_BYTES_SIZE = 524288000;
-
-if (!isset($_FILES['file'])) {
-    respondWithBadRequest('No file uploaded');
-}
-
-if ($_FILES['file']['size'] > MAX_FILE_BYTES_SIZE) {
-    respondWithBadRequest("The size of the uploaded archive must not exceed " . MAX_FILE_BYTES_SIZE . ' bytes.');
-}
 
 try {
     $storage = Storage::getInstance();
@@ -84,9 +66,23 @@ try {
 
     switch ($options['input-data']) {
         case 'upload':
+            if (!isset($_FILES['file']) || $_FILES['file']['size'] == 0) {
+                respondWithBadRequest('No file uploaded');
+            }
+
+            if ($_FILES['file']['size'] > MAX_FILE_BYTES_SIZE) {
+                respondWithBadRequest("The size of the uploaded archive must not exceed " . MAX_FILE_BYTES_SIZE . ' bytes.');
+            }
+
             $filename = $_FILES['file']['name'];
             $filenameTmp = $_FILES['file']['tmp_name'];
             $filetype = $_FILES['file']['type'];
+            
+            if (!isValidFileName($filename, $options['delimiter']))
+            {
+                $optionDelimiter = $options['delimiter'];
+                respondWithBadRequest("The uploaded file's name must not contain the following symbols: '.', ',' or '$optionDelimiter'");
+            }
             break;
         case 'history':
             $fileMeta = Storage::getInstance()->getSourceData($options['history-meta']);
@@ -95,6 +91,11 @@ try {
             $filetype = mime_content_type($filenameTmp);
             break;
         default:
+            if (empty($options['input-data']))
+            {
+                respondWithBadRequest("Select input file, url or history item.");
+            }
+
             $opts = array(
                 'http'=>array(
                 'method'=>"GET",
@@ -112,6 +113,17 @@ try {
             
             $context = stream_context_create($opts);
             $downloadedFile = file_get_contents($options['input-data'], false, $context);
+
+            if (strlen($downloadedFile) > MAX_FILE_BYTES_SIZE) {
+                respondWithBadRequest("The size of the uploaded archive must not exceed " . MAX_FILE_BYTES_SIZE . ' bytes.');
+            }
+
+            if (!isValidFileName($filename, $options['delimiter']))
+            {
+                $optionDelimiter = $options['delimiter'];
+                respondWithBadRequest("The uploaded file's name must not contain the following symbols: '.', ',' or '$optionDelimiter'");
+            }
+
             file_put_contents($filenameTmp, $downloadedFile);
             $newFileName = md5_file($dir . $filename). '.' . $extension;
             $filetype = mime_content_type($filenameTmp);
@@ -176,11 +188,11 @@ function authenticateUser()
 function parseOptions(): array
 {
     if (!isset($_POST['options'])) {
-        return DEFAULT_OPTIONS;
+        return Config::$DEFAULT_OPTIONS;
     }
     $options = json_decode($_POST['options'], true);
     if (!$options) {
-        return DEFAULT_OPTIONS;
+        return Config::$DEFAULT_OPTIONS;
     }
 
     $includedFields = $options['included-fields'];
@@ -217,7 +229,7 @@ function parseOptions(): array
     // }
 
     for ($i = 0; $i < sizeof($options['included-fields']); $i++) {
-        if (!in_array($options['included-fields'][$i], DEFAULT_OPTIONS['included-fields'])) {
+        if (!in_array($options['included-fields'][$i], Config::$DEFAULT_OPTIONS['included-fields'])) {
             array_splice($options['included-fields'], $i, 1);
         }
     }
@@ -246,4 +258,12 @@ function checkKeyForDelimiter($key, $array, $delimiter) {
             respondWithBadRequest('Chosen conversion options are invalid. CSS and URL values cannot contain the chosen delimiter.');
         }
     }
+}
+
+function isValidFileName($filename, $optionsDelimiter)
+{
+    $filenameWithoutExtension = pathinfo($filename)['filename'];
+    return !str_contains($filenameWithoutExtension, $optionsDelimiter) &&
+           !str_contains($filenameWithoutExtension, ".") &&
+           !str_contains($filenameWithoutExtension, ",");
 }

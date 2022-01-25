@@ -187,50 +187,42 @@ function processConversion(event) {
         return;
     }
 
-    // let zip = await getUploadedFile(optionsJson, isInputLoadedFromHistory(optionsJson));
-
-  
     if (optionsJson['input-data'] == 'upload') {
         formData.append('file', document.getElementById('file-input').files[0]);
     }
-
-    // if (!zip) {
-    //     terminateRequest('A file must be uploaded for conversion');
-    //     return;
-    // }
-
-    // if (zip.size > MAX_FILE_SIZE_BYTES) {
-    //     terminateRequest(`The uploaded archive's size must not exceed ${MAX_FILE_SIZE_BYTES} bytes`);
-    //     return;
-    // }
-
-    // // handles files with name `something.other.thing.zip`
-    // const nameWithoutExtension = zip.name.split('.').slice(0, -1).join('');
-    
-    // if (nameWithoutExtension.includes(requestedDelimiter) || nameWithoutExtension.includes('.')
-    //     || nameWithoutExtension.includes(',')) {
-    //     const msgAddition = requestedDelimiter !== ',' ? ` and '${requestedDelimiter}'` : '';
-    //     terminateRequest(`The uploaded file's name must not contain the following symbols: '.', ',' ${msgAddition}`);
-    //     return;
-    // }
 
     fetch('./../../backend/api/archive.php', {
         method: 'POST',
         body: formData
     }).then(response => {
-        response.text().then(text => {
-            if (response.status !== 200) {
-                terminateRequest(text);
-                return;
-            }
 
-            resultPlaceholder.innerHTML = '';
-            resultPlaceholder.style.color = 'white';
+        if (response.status !== 200)
+        {
+            return response.json();
+        }
+        
+        return {
+            options: JSON.parse(response.headers.get('X-Applied-Options')),
+            filename: JSON.parse(response.headers.get('File-name')),
+            textPromise: response.text()
+        }
+        
+    }).then(responseData => {
+        
+        const { textPromise, options, filename, error } = responseData;
 
-            const options = JSON.parse(response.headers.get('X-Applied-Options'));
+        if (error)
+        {
+            throw error;
+        }
+        textPromise.then(text => {
+
             const fileColor = options['file-type-color'];
             const regexColor = options['regex-color'];
 
+            resultPlaceholder.innerHTML = '';
+            resultPlaceholder.style.color = 'white';
+            
             delimiter = options.delimiter ? options.delimiter : ',';
             typeIndex = options['included-fields'] ? options['included-fields'].indexOf('type') : -1;
 
@@ -240,32 +232,27 @@ function processConversion(event) {
                 const lineElement = document.createElement('div');
                 var match = line.match(regexColor['regex']);
                 var splitStr = line.split(match);
-                if(match)
-                {
+                if (match) {
                     var coloredText = "<span style='color:" + regexColor['color'] + "'>" + match + "</span>";
                     var result = splitStr[0];
-                    for(let i = 1; i < splitStr.length; i++)
-                    {
+                    for (let i = 1; i < splitStr.length; i++) {
                         result += coloredText + splitStr[i];
                     }
                     lineElement.innerHTML = result;
                 }
-                else
-                {
+                else {
                     lineElement.innerHTML = line;
                 }
                 lineElement.style.color = colorFile(line, delimiter, typeIndex, fileColor);
                 resultPlaceholder.appendChild(lineElement);
-
-                
             });
 
-            const filename = JSON.parse(response.headers.get('File-name'));
             createCsvDownloadLink(text, filename);
             updateDownloadHTMLLink();
-
         });
-    })
+    }).catch(err => {
+        terminateRequest(err);
+    });
 }
 
 function colorFile(line, delimiter, typeIndex, fileColor) {
