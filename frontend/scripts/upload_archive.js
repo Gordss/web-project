@@ -45,6 +45,7 @@ async function initializeOptions() {
     options = document.getElementById('options-input');
 
     options.addEventListener('keydown', (e) => {
+        beforeKey = options.selectionStart;
         if(optionsStr != options.value)
         {
             return;
@@ -61,6 +62,17 @@ async function initializeOptions() {
             parsedOptions['input-config'] = "textarea";
             options.innerHTML = JSON.stringify(parsedOptions, null, '\t');
         }
+
+        options.selectionStart = beforeKey;
+    })
+
+    fileInput = document.getElementById('file-input');
+    fileInput.addEventListener('change', () => {
+        options = document.getElementById('options-input');
+        optionsJson = JSON.parse(options.value);
+        optionsJson['input-data'] = "upload";
+        delete optionsJson['history-meta'];
+        options.innerHTML = JSON.stringify(optionsJson, null, '\t');
     })
 
     let oldOptionsJson = await fetchOptions(loadedConversion);

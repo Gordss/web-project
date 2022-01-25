@@ -90,6 +90,9 @@ try {
             $filenameTmp = $fileMeta["SourcePath"];
             $filetype = mime_content_type($filenameTmp);
             break;
+        case 'output':
+            
+            break;
         default:
             if (empty($options['input-data']))
             {
@@ -128,8 +131,8 @@ try {
             $newFileName = md5_file($dir . $filename). '.' . $extension;
             $filetype = mime_content_type($filenameTmp);
             rename($filenameTmp, $dir . $newFileName);
-            $filename = $newFileName;
-            $filenameTmp = $dir . $filename;
+            // $filename = $newFileName;
+            $filenameTmp = $dir . $newFileName;
             break;
     }
 
