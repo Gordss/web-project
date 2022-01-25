@@ -39,7 +39,26 @@ function loadGreetingHeader() {
 async function initializeOptions() {
     const params = new URLSearchParams(window.location.search);
     const loadedConversion = params.get('conversion');
-    const options = document.getElementById('options-input');
+    options = document.getElementById('options-input');
+
+    options.addEventListener('keydown', (e) => {
+        if(optionsStr != options.value)
+        {
+            return;
+        }
+
+        e.preventDefault();
+
+        parsedOptions = null;
+        try {
+            parsedOptions = JSON.parse(options.value);
+        } catch (e) {
+            return;
+        } finally {
+            parsedOptions['input-config'] = "textarea";
+            options.innerHTML = JSON.stringify(parsedOptions, null, '\t');
+        }
+    })
 
     let oldOptionsJson = await fetchOptions(loadedConversion);
     let optionsStr = null;
@@ -136,8 +155,7 @@ function optionsKeyDownHandler(e, options)
     }
 }
 
-async function processConversion(event) {
-
+function processConversion(event) {
     event.preventDefault();
     document.getElementById("download-csv").style.display = 'none';
 
@@ -155,28 +173,33 @@ async function processConversion(event) {
         return;
     }
 
-    let zip = await getUploadedFile(optionsJson, isInputLoadedFromHistory(optionsJson));
-    if (!zip) {
-        terminateRequest('A file must be uploaded for conversion');
-        return;
+    // let zip = await getUploadedFile(optionsJson, isInputLoadedFromHistory(optionsJson));
+
+    let zip;
+    if (optionsJson['input-data'] == 'upload') {
+        zip = document.getElementById('file-input').files[0];
+        formData.append('file', document.getElementById('file-input').files[0]);
     }
 
-    if (zip.size > MAX_FILE_SIZE_BYTES) {
-        terminateRequest(`The uploaded archive's size must not exceed ${MAX_FILE_SIZE_BYTES} bytes`);
-        return;
-    }
+    // if (!zip) {
+    //     terminateRequest('A file must be uploaded for conversion');
+    //     return;
+    // }
 
-    // handles files with name `something.other.thing.zip`
-    const nameWithoutExtension = zip.name.split('.').slice(0, -1).join('');
+    // if (zip.size > MAX_FILE_SIZE_BYTES) {
+    //     terminateRequest(`The uploaded archive's size must not exceed ${MAX_FILE_SIZE_BYTES} bytes`);
+    //     return;
+    // }
+
+    // // handles files with name `something.other.thing.zip`
+    // const nameWithoutExtension = zip.name.split('.').slice(0, -1).join('');
     
-    if (nameWithoutExtension.includes(requestedDelimiter) || nameWithoutExtension.includes('.')
-        || nameWithoutExtension.includes(',')) {
-        const msgAddition = requestedDelimiter !== ',' ? ` and '${requestedDelimiter}'` : '';
-        terminateRequest(`The uploaded file's name must not contain the following symbols: '.', ',' ${msgAddition}`);
-        return;
-    }
-
-    formData.append('file', zip);
+    // if (nameWithoutExtension.includes(requestedDelimiter) || nameWithoutExtension.includes('.')
+    //     || nameWithoutExtension.includes(',')) {
+    //     const msgAddition = requestedDelimiter !== ',' ? ` and '${requestedDelimiter}'` : '';
+    //     terminateRequest(`The uploaded file's name must not contain the following symbols: '.', ',' ${msgAddition}`);
+    //     return;
+    // }
 
     fetch('./../../backend/api/archive.php', {
         method: 'POST',
@@ -250,8 +273,6 @@ function isInputLoadedFromHistory(json)
 {
     return json.hasOwnProperty('input-data') &&
         json['input-data'] === "history" &&
-        json.hasOwnProperty('input-config') &&
-        json['input-config'] === "history" &&
         json.hasOwnProperty('history-meta');
 }
 
@@ -267,43 +288,6 @@ async function fetchOptions(converionId)
                 return null;
             }
         }) : null;
-}
-
-async function getUploadedFile(json, isLoadedFileFromHistory) {
-
-    if (isLoadedFileFromHistory)
-    {
-        // { ServerName, OriginalName}
-        const fileData = await fetchSourceServerName(json['history-meta']);
-    
-        if (fileData == null ||
-            !fileData.hasOwnProperty('ServerName') ||
-            !fileData.hasOwnProperty('OriginalName'))
-        {
-            return null;
-        }
-
-        const { ServerName, OriginalName } = fileData;
-
-        return fetch(`./../../backend/files/${ServerName}`)
-            .then(res => res.blob())
-            .then(data => {
-                return new File([data], OriginalName, {type: data.type});
-            });
-    }
-    else
-    {
-        return document.getElementById('file-input').files[0];   
-    }
-}
-
-async function fetchSourceServerName(conversionId)
-{
-    return fetch(`./../../backend/api/archive.php?id=${conversionId}&servername=true`)
-        .then(res => res.json())
-        .then(data => {
-            return data.hasOwnProperty('success') ? data['success'] : null;
-        });
 }
 
 function createCsvDownloadLink(csvContent, zipName) {

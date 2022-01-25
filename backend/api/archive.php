@@ -77,11 +77,55 @@ if ($_FILES['file']['size'] > MAX_FILE_BYTES_SIZE) {
 try {
     $storage = Storage::getInstance();
     $options = parseOptions();
-    if(verifyIsArchive($_FILES["file"]["type"])) {
-        $conversion = $storage->insertConversion($_FILES['file']['tmp_name'], $_FILES['file']['name'], $username, $options, true);
+    
+    if(!array_key_exists('input-data', $options)) {
+        respondWithBadRequest('The input-data field is missing');
     }
-    else if(verifyIsCSV($_FILES["file"]["type"])) {
-        $conversion = $storage->insertConversion($_FILES['file']['tmp_name'], $_FILES['file']['name'], $username, $options, false);
+
+    switch ($options['input-data']) {
+        case 'upload':
+            $filename = $_FILES['file']['name'];
+            $filenameTmp = $_FILES['file']['tmp_name'];
+            $filetype = $_FILES['file']['type'];
+            break;
+        case 'history':
+            $fileMeta = Storage::getInstance()->getSourceData($options['history-meta']);
+            $filename = $fileMeta["ServerName"];
+            $filenameTmp = $fileMeta["SourcePath"];
+            $filetype = mime_content_type($filenameTmp);
+            break;
+        default:
+            $opts = array(
+                'http'=>array(
+                'method'=>"GET",
+                'header'=>"Accept-language: en\r\n" .
+                            "Cookie: foo=bar\r\n"
+                )
+            );
+
+            $dir = '../files/';
+            $filename = explode('/', $options['input-data']);
+            $filename = end($filename);
+            $extension = explode('.', $filename);
+            $extension = end($extension);
+            $filenameTmp = $dir . $filename;
+            
+            $context = stream_context_create($opts);
+            $downloadedFile = file_get_contents($options['input-data'], false, $context);
+            file_put_contents($filenameTmp, $downloadedFile);
+            $newFileName = md5_file($dir . $filename). '.' . $extension;
+            $filetype = mime_content_type($filenameTmp);
+            rename($filenameTmp, $dir . $newFileName);
+            $filename = $newFileName;
+            $filenameTmp = $dir . $filename;
+            break;
+    }
+
+    if(verifyIsArchive($filetype)) {
+        $conversion = $storage->insertConversion($filenameTmp, $filename, $username, $options, true);
+    }
+    else if(verifyIsCSV($filetype)) {
+        $conversion = $storage->insertConversion($filenameTmp, $filename, $username, $options, false);
     }
     else {
         respondWithBadRequest('The uploaded file is not a zip archive or comma separated file');
@@ -164,11 +208,11 @@ function parseOptions(): array
         }
     }
 
-    foreach (DEFAULT_OPTIONS as $key => $value) {
-        if (!array_key_exists($key, $options)) {
-            $options[$key] = $value;
-        }
-    }
+    // foreach (DEFAULT_OPTIONS as $key => $value) {
+    //     if (!array_key_exists($key, $options)) {
+    //         $options[$key] = $value;
+    //     }
+    // }
 
     for ($i = 0; $i < sizeof($options['included-fields']); $i++) {
         if (!in_array($options['included-fields'][$i], DEFAULT_OPTIONS['included-fields'])) {

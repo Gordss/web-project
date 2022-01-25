@@ -34,7 +34,7 @@ class Storage
 
     public function insertConversion($path, $tempFileName, $username, $options, $isArchive)
     {
-        $location = './../files/';
+        $location = '../files/';
         if ( !file_exists( $location ) && !is_dir( $location ) ) {
             mkdir( $location );
         }
@@ -137,7 +137,11 @@ class Storage
 
     public function getSourceData($conversionId)
     {
-        $sql = "SELECT CONCAT(Md5_Sum, '.', SourceExtension) AS ServerName, CONCAT(SourceName, '.', SourceExtension) AS OriginalName FROM Conversion WHERE id = ?";
+        $sql = "SELECT CONCAT(Md5_Sum, '.', SourceExtension) AS ServerName, 
+                       CONCAT(SourceName, '.', SourceExtension) AS OriginalName,
+                       SourcePath
+                FROM Conversion 
+                WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$conversionId]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
