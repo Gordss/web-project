@@ -1,5 +1,4 @@
 let delimiter = ',', typeIndex = -1;
-const MAX_FILE_SIZE_BYTES = 524288000; // 500 MB
 
 window.onload = function ()
 {
@@ -188,12 +187,11 @@ function processConversion(event) {
     const resultPlaceholder = document.getElementById('csv-result-placeholder');
     const formData = new FormData(document.getElementById('upload-form'));
     let optionsJson;
-    let requestedDelimiter;
 
     // validate if options are valid JSON
     try {
         optionsJson = JSON.parse(formData.get('options'));
-        requestedDelimiter = optionsJson?.delimiter ? optionsJson.delimiter : ',';
+        optionsJson.delimiter = optionsJson?.delimiter ? optionsJson.delimiter : ',';
     } catch (e) {
         terminateRequest('The options for the conversion must be a valid JSON string');
         return;
@@ -235,7 +233,7 @@ function processConversion(event) {
             resultPlaceholder.innerHTML = '';
             resultPlaceholder.style.color = 'white';
             
-            delimiter = options.delimiter ? options.delimiter : ',';
+            const delimiter = options.delimiter ? options.delimiter : ',';
             typeIndex = options['included-fields'] ? options['included-fields'].indexOf('type') : -1;
 
             const lines = text.split("\n");
@@ -283,13 +281,6 @@ function colorFile(line, delimiter, typeIndex, fileColor) {
         return fileColor['directory'];
     }
     return defaultColor;
-}
-
-function isInputLoadedFromHistory(json)
-{
-    return json.hasOwnProperty('input-data') &&
-        json['input-data'] === "history" &&
-        json.hasOwnProperty('history-meta');
 }
 
 async function fetchOptions(converionId)

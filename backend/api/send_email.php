@@ -1,6 +1,7 @@
 <?php
 
     require_once './../../vendor/autoload.php';
+    require_once './config.php';
     require_once 'Storage.php';
     require_once './../utils/send_response.php';
 
@@ -19,15 +20,16 @@
     if ($userIsValid) {
         //send email
         $transport = (new Swift_SmtpTransport('smtp.gmail.com', 587, 'tls'))
-            ->setUsername('webconverter7@gmail.com')
-            ->setPassword('jkuvibuauzaxzfgs');
+            ->setUsername(Config::$FORGOT_PASSWORD_USERNAME)
+            ->setPassword(Config::$FORGOT_PASSWORD_PASSWORD);
 
         $mailer = new Swift_Mailer($transport);
 
+        $prefixUrl = Config::$FORGOT_PASSWORD_URL;
         $message = (new Swift_Message('Change your password'))
-            ->setFrom('webconverter7@gmail.com')
+            ->setFrom(Config::$FORGOT_PASSWORD_USERNAME)
             ->setTo($email)
-            ->setBody("Click on the link to change your password: http://localhost/web-project/frontend/pages/validation.html?token=" . $token . " .");
+            ->setBody("Click on the link to change your password: $prefixUrl" . $token . " .");
         
         $result = $mailer->send($message);
 

@@ -1,5 +1,6 @@
 <?php
 
+    require_once "./config.php";
     require "Storage.php";
     require_once './../utils/send_response.php';
 
@@ -17,8 +18,9 @@
         sendResponse('Invalid email', TRUE, 401);
     }
 
-    if (strlen($username) < 3) {
-        sendResponse('Username must be at least 3 characters in length', TRUE, 401);
+    $minUsernameSize = Config::$MIN_USERNAME_SIZE;
+    if (strlen($username) < $minUsernameSize) {
+        sendResponse("Username must be at least $minUsernameSize characters in length", TRUE, 401);
     }
 
     if (!preg_match("#^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$#", $password)) {
@@ -38,7 +40,7 @@
     }
 
     $password = password_hash($password, PASSWORD_DEFAULT);
-    $token = bin2hex(random_bytes(50));
+    $token = bin2hex(random_bytes(Config::$USER_TOKEN_SIZE));
     $error = Storage::getInstance()->registerUser($email, $username, $password, $token);
     if (!empty($error)) {
         sendResponse('This username is already taken', TRUE, 401);

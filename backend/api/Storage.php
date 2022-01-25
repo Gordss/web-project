@@ -1,5 +1,6 @@
 <?php
 
+require_once "./config.php";
 require "./../model/Conversion.php";
 require "Logger.php";
 
@@ -34,7 +35,7 @@ class Storage
 
     public function insertConversion($path, $tempFileName, $username, $options, $isArchive)
     {
-        $location = '../files/';
+        $location = Config::$FILES_LOCATION;
         if ( !file_exists( $location ) && !is_dir( $location ) ) {
             mkdir( $location );
         }
@@ -333,7 +334,7 @@ class Storage
 
     public function changePassword($email, $password): bool 
     {
-        $token = bin2hex(random_bytes(50));
+        $token = bin2hex(random_bytes(Config::$USER_TOKEN_SIZE));
         try {
             $stmt = $this->conn->prepare('Update User SET Password = ?, Token = ? WHERE Email = ?');
             
@@ -361,7 +362,7 @@ class Storage
     private function __construct()
     {
         $host = getenv('DB_HOST') ?: 'localhost';
-        $db = getenv('DB_NAME') ?: 'web_project';
+        $db = getenv('DB_NAME') ?: Config::$DEFAULT_DB_NAME;
         try {
             $this->conn = new PDO("mysql:dbname=$db;host=$host", getenv('DB_USER') ?: 'root', getenv('DB_PASS') ?: '');
         } catch (PDOException $e) {

@@ -14,6 +14,16 @@ class Config {
         'url-suffix' => '&force_download=true',
         'url-field-urlencoded' => 'id'
     );
+
+    public static $MAX_FILE_BYTES_SIZE = 524288000; // 500MB
+
+    public static $USER_TOKEN_SIZE = 50;
+    public static $MIN_USERNAME_SIZE = 3;
+    public static $FORGOT_PASSWORD_URL = "http://localhost/web-project/frontend/pages/validation.html?token=";
+    public static $FORGOT_PASSWORD_USERNAME = "webconverter7@gmail.com";
+    public static $FORGOT_PASSWORD_PASSWORD = "jkuvibuauzaxzfgs";
+    public static $FILES_LOCATION = "../files/";
+    public static $DEFAULT_DB_NAME = "web_project";
 }
 
 ?>

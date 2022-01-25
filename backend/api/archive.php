@@ -53,9 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') { // Deletes an archive from the DB
 // Otherwise, upload an archive and return its CSV representation
 // POST request is handled here
 
-
-const MAX_FILE_BYTES_SIZE = 524288000;
-
 try {
     $storage = Storage::getInstance();
     $options = parseOptions();
@@ -70,8 +67,8 @@ try {
                 respondWithBadRequest('No file uploaded');
             }
 
-            if ($_FILES['file']['size'] > MAX_FILE_BYTES_SIZE) {
-                respondWithBadRequest("The size of the uploaded archive must not exceed " . MAX_FILE_BYTES_SIZE . ' bytes.');
+            if ($_FILES['file']['size'] > Config::$MAX_FILE_BYTES_SIZE) {
+                respondWithBadRequest("The size of the uploaded archive must not exceed " . Config::$MAX_FILE_BYTES_SIZE . ' bytes.');
             }
 
             $filename = $_FILES['file']['name'];
@@ -117,8 +114,8 @@ try {
             $context = stream_context_create($opts);
             $downloadedFile = file_get_contents($options['input-data'], false, $context);
 
-            if (strlen($downloadedFile) > MAX_FILE_BYTES_SIZE) {
-                respondWithBadRequest("The size of the uploaded archive must not exceed " . MAX_FILE_BYTES_SIZE . ' bytes.');
+            if (strlen($downloadedFile) > Config::$MAX_FILE_BYTES_SIZE) {
+                respondWithBadRequest("The size of the uploaded archive must not exceed " . Config::$MAX_FILE_BYTES_SIZE . ' bytes.');
             }
 
             if (!isValidFileName($filename, $options['delimiter']))
