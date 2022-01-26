@@ -88,7 +88,29 @@ try {
             $filetype = mime_content_type($filenameTmp);
             break;
         case 'output':
+            $storage = Storage::getInstance();
+            $conversion = $storage->getLastConversion();
+            $csvString = $storage->getConversionCSV($conversion['Id']);
+            $extension = '.csv';
             
+            $dir = Config::$FILES_LOCATION;
+            $filename =  $conversion['SourceName'] . $extension;
+            $filenameTmp = $dir . $filename;
+            $lines = explode(PHP_EOL, $csvString);
+            array_pop($lines);
+
+            $csvFile = fopen($filenameTmp, 'w');
+            foreach ($lines as $line) {
+                $fields = explode(',', $line);
+                fputcsv($csvFile, $fields);
+            }
+            fclose($csvFile);
+
+            $newFileName = md5_file($dir . $filename).$extension;
+            rename($filenameTmp, $dir . $newFileName);
+            $filenameTmp = $dir .$newFileName;
+            $filetype = 'application/csv';
+
             break;
         default:
             if (empty($options['input-data']))
@@ -104,7 +126,7 @@ try {
                 )
             );
 
-            $dir = '../files/';
+            $dir = Config::$FILES_LOCATION;
             $filename = explode('/', $options['input-data']);
             $filename = end($filename);
             $extension = explode('.', $filename);

@@ -48,8 +48,11 @@ class Storage
 
         if(!$fileSameMd5) {
             $newPath = $location . md5_file($path) . '.' . $fileExtension;
-            // move archive to server storage
-            move_uploaded_file($path, $newPath);
+            // move archive to server storage 
+
+            if(pathinfo($path)['dirname'] !== Config::$FILES_LOCATION) {
+                move_uploaded_file($path, $newPath);
+            }
         }
         else {
             $newPath = $location . $fileSameMd5;
@@ -121,6 +124,15 @@ class Storage
         $options = json_decode($result['Options'], true);
 
         return $conversion->toCSV($options);
+    }
+
+    public function getLastConversion()
+    {
+        $sql = 'SELECT * FROM `conversion` ORDER BY Id DESC LIMIT 1';
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result;
     }
 
     public function getOptions($conversionId): ?string
