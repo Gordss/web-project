@@ -24,7 +24,10 @@ class Config {
     public static $FORGOT_PASSWORD_USERNAME = "webconverter7@gmail.com";
     public static $FORGOT_PASSWORD_PASSWORD = "jkuvibuauzaxzfgs";
     public static $FILES_LOCATION = "../files/";
+    public static $DEFAULT_DB_HOST = "localhost";
     public static $DEFAULT_DB_NAME = "web_project";
+    public static $DEFAULT_DB_USER = "root";
+    public static $DEFAULT_DB_PASS = "";
 }
 
 ?>

@@ -373,10 +373,10 @@ class Storage
 
     private function __construct()
     {
-        $host = getenv('DB_HOST') ?: 'localhost';
+        $host = getenv('DB_HOST') ?: Config::$DEFAULT_DB_HOST;
         $db = getenv('DB_NAME') ?: Config::$DEFAULT_DB_NAME;
         try {
-            $this->conn = new PDO("mysql:dbname=$db;host=$host", getenv('DB_USER') ?: 'root', getenv('DB_PASS') ?: '');
+            $this->conn = new PDO("mysql:dbname=$db;host=$host", getenv('DB_USER') ?: Config::$DEFAULT_DB_USER, getenv('DB_PASS') ?: Config::$DEFAULT_DB_PASS);
         } catch (PDOException $e) {
             Logger::log('Could not connect to DB: ' . $e->getMessage());
             http_response_code(500);
