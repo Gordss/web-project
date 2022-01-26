@@ -19,6 +19,7 @@ class Config {
 
     public static $USER_TOKEN_SIZE = 50;
     public static $MIN_USERNAME_SIZE = 3;
+    public static $REMOVE_FORGOT_PASSWORD_FUNCTION = TRUE; //set it to TRUE to remove library usage for changing password
     public static $FORGOT_PASSWORD_URL = "http://localhost/web-project/frontend/pages/validation.html?token=";
     public static $FORGOT_PASSWORD_USERNAME = "webconverter7@gmail.com";
     public static $FORGOT_PASSWORD_PASSWORD = "jkuvibuauzaxzfgs";

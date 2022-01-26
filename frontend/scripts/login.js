@@ -1,6 +1,31 @@
 const loginForm = document.getElementById('login-form');
 const errorDiv = document.getElementById('error');
 
+window.onload = function ()
+{
+    fetch('./../../backend/api/library_usage.php')
+    .then((response) => {
+        if (response.status !== 200)
+        {
+            return response.json();
+        }
+        
+        return {
+            NoLibrary: JSON.parse(response.headers.get('No-library'))
+        }
+    })
+    .then((data) => {
+
+        const { NoLibrary} = data;
+
+        if(NoLibrary)
+        {
+            document.getElementById("forgot-password").style.visibility = "hidden";
+        }
+
+    });
+};
+
 loginForm.addEventListener('submit', (event) => {
     
     event.preventDefault();
