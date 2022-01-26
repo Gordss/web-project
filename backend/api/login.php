@@ -1,5 +1,4 @@
 <?php
-    require_once "./config.php";
     require_once 'Storage.php';
     require_once './../utils/send_response.php';
 
